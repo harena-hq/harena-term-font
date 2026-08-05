@@ -29,7 +29,7 @@ Ship two faces with the regional forms **baked into `cmap`**:
 
 ## Measured cost of the split
 
-611 codepoints of the 37064 covered render differently, all inside han:
+611 codepoints of the 37652 covered render differently, all inside han:
 
 | | |
 |---|---|

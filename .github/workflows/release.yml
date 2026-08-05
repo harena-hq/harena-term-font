@@ -46,6 +46,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y unzip xz-utils libharfbuzz-bin zip
 
+      # The tag and the font's internal version must be the same number, or a
+      # user installs v0.9.0 and their font manager reports something else.
+      # verify.py asserts head.fontRevision and nameID 5 against VERSION; only
+      # the tag lives outside the build, so it is checked here.
+      - name: Check the tag matches VERSION
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          version=$(python3 -c 'import sys; sys.path.insert(0, "scripts"); import build; print(build.VERSION)')
+          # fontRevision is X.YYY: one digit of minor, two of patch.
+          # 0.900 -> v0.9.0, 1.012 -> v1.0.12. Taking one character for the
+          # patch instead of the rest silently turns 0.912 into v0.9.1.
+          expected="v$(echo "$version" | awk -F. '{printf "%d.%d.%d", $1, substr($2,1,1), substr($2,2)+0}')"
+          echo "VERSION=$version  expected tag=$expected  actual tag=$TAG"
+          [ "$TAG" = "$expected" ] || { echo "tag does not match build.VERSION"; exit 1; }
+
       - name: Fetch build sources
         run: scripts/fetch_sources.sh
       - name: Build fonts
@@ -54,7 +70,7 @@ jobs:
         run: python3 scripts/postbuild.py
 
       - name: Run conformance verification
-        run: python3 scripts/verify.py | tee gate.log && grep -q '^146/146 checks passed' gate.log
+        run: python3 scripts/verify.py | tee gate.log && grep -q '^154/154 checks passed' gate.log
       # The committed SHA256SUMS is what the README claims is reproducible.
       # postbuild.py rewrites it from this build, so comparing the two proves the
       # tag reproduces the recorded bytes rather than merely producing some.

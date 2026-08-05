@@ -44,7 +44,7 @@ alternatives that lost and why, and the mistakes that produced a rule.
 
 | | |
 |---|---|
-| [0015](0015-ttf-and-woff2-only.md) | TTF and WOFF2 only. OTF is declined structurally — CFF discards the ttfautohint work on all 36859 hinted glyphs, curve conversion moves points the cell measurements have no room for, and the 146 checks read `glyf`. TTC is declined on arithmetic: a collection shares byte-identical **tables**, not glyphs, and 611 differing glyphs keep all 17.66 MB of `glyf` duplicated — **0.6% saved**. |
+| [0015](0015-ttf-and-woff2-only.md) | TTF and WOFF2 only. OTF is declined structurally — CFF discards the ttfautohint work on all 36859 hinted glyphs, curve conversion moves points the cell measurements have no room for, and the 154 checks read `glyf`. TTC is declined on arithmetic: a collection shares byte-identical **tables**, not glyphs, and 611 differing glyphs keep all 17.66 MB of `glyf` duplicated — **0.6% saved**. |
 
 ## Identity
 
@@ -56,7 +56,7 @@ alternatives that lost and why, and the mistakes that produced a rule.
 
 | | |
 |---|---|
-| [0014](0014-the-compensation-target-erases-the-source-relative-weighting.md) | Compensating every script to the **Latin stem** divides out the relative weighting the source's designers built between scripts. Pretendard draws hangul 13.5–15.3% heavier than han; this build flattens it to ~1% and inverts katakana against hangul (0.971 → 1.130). Measured on 225 glyphs. Lands on top of v1.0.0, not inside it. |
+| [0014](0014-the-compensation-target-erases-the-source-relative-weighting.md) | Compensating every script to the **Latin stem** divides out the relative weighting the source's designers built between scripts. Pretendard draws hangul 13.5–15.3% heavier than han; this build flattens it to ~1% and inverts katakana against hangul (0.971 → 1.130). Measured on 225 glyphs. Lands on top of v0.9.0, and is one of the three things 1.0.0 waits on. |
 
 ## Recurring shapes
 

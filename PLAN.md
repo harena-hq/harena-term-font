@@ -147,7 +147,7 @@ baked into `cmap` and two faces ship.
 - **Harena Term K** — `ss05` applied, restricted to the han range
 - **Harena Term J** — default forms
 
-611 codepoints of 37064 differ, all inside han, with **zero advance
+611 codepoints of 37652 differ, all inside han, with **zero advance
 differences** — so the two faces can even be mixed on one screen without
 shearing a row. See [ADR 0006](docs/adr/0006-two-regional-cuts-with-ss05-baked-in.md).
 
@@ -205,7 +205,7 @@ fallback beats a glyph that renders faint.
 ## 2. Done-when
 
 Automated, in [`scripts/verify.py`](scripts/verify.py), **asserting rather than
-reporting** — the exit code is the gate. Status: **146/146 across all four
+reporting** — the exit code is the gate. Status: **154/154 across all four
 faces.**
 
 1. every CJK advance is exactly 2× the Latin advance; every half-width glyph exactly 1×

@@ -128,6 +128,21 @@ def verify(path: str, g: Gate) -> None:
             "head carries the pinned build stamp",
             f"created={head.created} modified={head.modified} want={want_ts}")
 
+    # The version a release is tagged with must be the version the font reports,
+    # or a user installs 0.9.0 and their font manager says 1.000. VERSION feeds
+    # two records that are set independently, so a partial edit is possible and
+    # silent. head.fontRevision is Fixed 16.16, so 0.900 stores as 0.89999... --
+    # compare at the precision the format actually has, not with ==.
+    want_rev = float(build.VERSION)
+    got_rev = head.fontRevision
+    g.check(abs(got_rev - want_rev) < 1 / 65536,
+            "head.fontRevision matches VERSION",
+            f"fontRevision={got_rev} want={want_rev}")
+    ver_names = {r.toUnicode() for r in f["name"].names if r.nameID == 5}
+    g.check(ver_names == {f"Version {build.VERSION}"},
+            "nameID 5 matches VERSION",
+            f"nameID 5={sorted(ver_names)} want='Version {build.VERSION}'")
+
     g.check(upm == 1000, "upm is 1000", f"upm={upm}")
     g.check(latin_adv * 2 == 1000, "CJK cell is exactly 2x the Latin advance",
             f"latin={latin_adv} cell={latin_adv * 2}")

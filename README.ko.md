@@ -26,6 +26,13 @@ Harena Term은 각 문자 체계를 **고유 폭이 셀에 정확히 떨어지�
 
 [**Releases**](../../releases/latest)에서 최신 배포본을 받으세요.
 
+> **0.9.0이고, 이 번호는 의도한 것입니다.** 글꼴 자체는 완성돼 있고 게이트를
+> 통과하며 재현 가능합니다. 다만 세 가지가 아직 확인되지 않았습니다 — 측정된
+> 획 굵기 결함 하나([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)),
+> Windows, 그리고 릴리스 파이프라인 자체. [왜 0.x인지](CHANGELOG.md#why-0x).
+> 글자 위치가 움직일 일은 없습니다 — 폭과 메트릭은 게이트가 단언합니다 — 그러나
+> CJK 획 굵기는 1.0 전에 바뀝니다.
+
 | | |
 |---|---|
 | `HarenaTerm-ttf.zip` | 데스크톱 — 터미널, 편집기, 워드프로세서 |
@@ -40,7 +47,7 @@ Regular, Bold.
 # macOS, Linux — 최신 배포본을 받아 설치합니다
 ./install/install-unix.sh
 
-./install/install-unix.sh --version v1.0.0   # 특정 버전
+./install/install-unix.sh --version v0.9.0   # 특정 버전
 ./install/install-unix.sh --from dist        # 직접 빌드한 것
 ```
 
@@ -121,7 +128,7 @@ cd dist && sha256sum -c ../SHA256SUMS
 ```
 
 `verify.py`는 **보고하지 않고 단언합니다** — 종료 코드가 곧 게이트입니다. 네 벌에
-걸쳐 **146개 검사**를 돌립니다: 모든 폭을 바이너리에서 다시 유도해 폭 제공자 표와
+걸쳐 **154개 검사**를 돌립니다: 모든 폭을 바이너리에서 다시 유도해 폭 제공자 표와
 대조(수록된 21349 코드포인트 전부), 모든 전각 글리프의 셀 초과 검사, NFD 음절
 11172개를 `ccmp` 합자 트리로 직접 순회, 자간을 Pretendard 원본과 대조, `OS/2`
 문자 체계 선언, 그리고 출시 바이트에 찍힌 재현성 스탬프까지.

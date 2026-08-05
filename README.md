@@ -28,6 +28,14 @@ covers at full width.
 
 Grab the latest release from [**Releases**](../../releases/latest).
 
+> **This is 0.9.0, and the version number is deliberate.** The font is complete,
+> gated and reproducible, and three things are still unchecked: one measured
+> weighting defect ([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)),
+> Windows, and the release pipeline itself. See
+> [why 0.x](CHANGELOG.md#why-0x). Nothing here is expected to move your text —
+> advances and metrics are asserted by the gate — but the CJK stroke weights
+> will change before 1.0.
+
 | | |
 |---|---|
 | `HarenaTerm-ttf.zip` | desktop — terminals, editors, word processors |
@@ -41,7 +49,7 @@ Each holds four faces: `Harena Term K` and `Harena Term J`, Regular and Bold.
 # macOS and Linux — downloads the latest release and installs it
 ./install/install-unix.sh
 
-./install/install-unix.sh --version v1.0.0   # a specific release
+./install/install-unix.sh --version v0.9.0   # a specific release
 ./install/install-unix.sh --from dist        # fonts you built yourself
 ```
 
@@ -125,7 +133,7 @@ cd dist && sha256sum -c ../SHA256SUMS
 ```
 
 `verify.py` **asserts rather than reports** — its exit code is the gate, and it
-runs **146 checks** across all four faces: every advance re-derived from the
+runs **154 checks** across all four faces: every advance re-derived from the
 binary and checked against the width provider across all 21349 covered
 codepoints, every full-width glyph scanned for cell overflow, all 11172 NFD
 syllables walked through the `ccmp` ligature tree, letterspacing measured against

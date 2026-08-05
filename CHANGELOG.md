@@ -6,14 +6,34 @@ Notable changes to Harena Term. Binaries are attached to each
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 applied to the font: a **major** bump changes metrics or naming in a way that
-moves existing text, a **minor** bump adds coverage or fixes a glyph, a
-**patch** bump changes nothing a reader can see.
+moves existing text, a **minor** bump adds coverage or changes how glyphs are
+drawn, a **patch** bump changes nothing a reader can see.
+
+The tag and the font's internal version are kept equal — `head.fontRevision`
+and `nameID 5` read the same number a release is tagged with, so a font manager
+and this file cannot disagree.
+
+### Why 0.x
+
+The font is complete, gated and reproducible, and it is still below 1.0 on
+purpose. **1.0.0 waits on three things**, all of them recorded rather than
+vague:
+
+1. **[ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)
+   resolved** — fixed, or accepted with a written rationale. Fixing it changes
+   every CJK outline, which 0.x permits in a minor bump and 1.x would not.
+2. **Windows verified** — TUI rendering and the installer. Neither has been
+   run, and this is a terminal font.
+3. **The release workflow exercised for real, at least once.**
+
+Until then a version number that claims stability would be claiming something
+nobody has checked.
 
 ## [Unreleased]
 
 Nothing yet.
 
-## [1.0.0] — 2026-08-04
+## [0.9.0] — 2026-08-05
 
 First public release. Four faces: `Harena Term K` and `Harena Term J`, Regular
 and Bold, at 38478 glyphs and 37652 codepoints each.
@@ -42,7 +62,7 @@ and Bold, at 38478 glyphs and 37652 codepoints each.
   elements 32, geometric 96, arrows 112, plus the Nerd Font icon sets.
   cp932 100%, cp949 99.98%.
 - Hinted with ttfautohint for ClearType.
-- **A conformance gate**, `scripts/verify.py`: 146 checks that assert rather
+- **A conformance gate**, `scripts/verify.py`: 154 checks that assert rather
   than report, run over the shipped binaries.
 - **A byte-reproducible build** from pinned sources, with `SHA256SUMS` written
   by the build itself and enforced in CI.
@@ -66,5 +86,5 @@ and Bold, at 38478 glyphs and 37652 codepoints each.
   See [ADR 0010](docs/adr/0010-ttfautohint-hints-y-only.md).
 - TUI rendering is verified on macOS. **Not verified on Windows.**
 
-[Unreleased]: ../../compare/v1.0.0...HEAD
-[1.0.0]: ../../releases/tag/v1.0.0
+[Unreleased]: ../../compare/v0.9.0...HEAD
+[0.9.0]: ../../releases/tag/v0.9.0

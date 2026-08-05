@@ -1,8 +1,11 @@
 # 0014 — The compensation target erases the source's relative script weighting
 
-Status: **open**. Measured, reproduced, and deliberately not acted on in v1.0.0 —
+Status: **open**. Measured, reproduced, and deliberately not acted on in v0.9.0 —
 the change lands on top of a released baseline rather than inside the first
 release, for the reason given at the end.
+
+**This is one of the three things 1.0.0 is waiting on.** The others are Windows
+verification and one real run of the release workflow.
 
 Reproduce with `python3 scripts/probe_script_weight.py`, from a tree where
 `fetch_sources.sh` has run and `dist/` is built.
@@ -127,8 +130,8 @@ without any measurement in front of them.
    the largest divergences are horizontal.
 
 Deferred deliberately, and the reason is release hygiene rather than doubt about
-the measurement. v1.0.0 is byte-reproducible from pinned sources and gated at
-146/146. This change alters every CJK outline in all four faces and invalidates
+the measurement. v0.9.0 is byte-reproducible from pinned sources and gated at
+154/154. This change alters every CJK outline in all four faces and invalidates
 every hash in `SHA256SUMS`, so it belongs on top of a released baseline where the
 diff is attributable to one decision — not folded into a first release where it
 would be indistinguishable from everything else.

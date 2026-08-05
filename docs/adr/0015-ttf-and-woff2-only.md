@@ -20,7 +20,7 @@ then hinted. Producing CFF is not a re-wrap, it is a different font:
   every measurement taken against the cell boundary has to be retaken — the
   worst overflow currently sits at exactly 1.0000 and the widest CJK ink at
   0.9760, which is not margin to spend on a conversion.
-- **The gate cannot run.** All 146 checks read `glyf`. A CFF font has none, so a
+- **The gate cannot run.** All 154 checks read `glyf`. A CFF font has none, so a
   large share of `verify.py` would need a second implementation, and the
   clean-room reproducibility proof would need a second path beside it.
 
@@ -61,7 +61,7 @@ Even if it were free, three costs remain:
   loading WOFF2 through `@font-face`. WOFF2 has a collection form with
   effectively no browser support, so the case this project optimises for gains
   nothing.
-- **The gate needs `fontNumber` indexing**, running all 146 checks per face
+- **The gate needs `fontNumber` indexing**, running all 154 checks per face
   inside the collection, and `SHA256SUMS` gains an artefact to prove.
 - **Installation gets harder**, particularly per-face registration on Windows,
   and font pickers that show only the first face in a collection are common.

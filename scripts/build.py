@@ -46,7 +46,7 @@ IOS_DIR = "sources/cand/IosevkaTerm"
 PJP = "sources/pjp/public/variable/PretendardJPVariable.ttf"
 OUT = "dist"
 
-VERSION = "1.000"
+VERSION = "0.900"
 VENDOR = "HRNA"
 
 # Reproducible builds. Two builds from identical inputs differed in exactly one
