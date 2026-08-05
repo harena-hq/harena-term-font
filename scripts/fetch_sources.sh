@@ -12,6 +12,7 @@
 # Usage:
 #   scripts/fetch_sources.sh              fetch everything and build the Latin
 #   scripts/fetch_sources.sh --no-latin   skip the Iosevka build (slow, needs Node)
+#   scripts/fetch_sources.sh --list       print the pinned files, one per line
 #
 # Optional: set HARENA_SOURCE_MIRROR to a base URL holding these files by
 # basename. Used only when an upstream fetch fails, which is the failure mode a
@@ -23,7 +24,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 BUILD_LATIN=1
-[ "${1:-}" = "--no-latin" ] && BUILD_LATIN=0
+LIST_ONLY=0
+case "${1:-}" in
+  --no-latin) BUILD_LATIN=0 ;;
+  --list)     LIST_ONLY=1 ;;
+esac
 
 MIRROR="${HARENA_SOURCE_MIRROR:-}"
 
@@ -36,6 +41,20 @@ GF_NOTO_COMMIT=b38c5c93af322c45f633e17ac440ec1e6c94d489
 IOSEVKA_TAG=v34.8.0
 IOSEVKA_COMMIT=ca3ad8e280e2f0b614a5a7721b047daaf023713d
 
+# One table, read by both the fetcher and `--list`. Anything that needs to know
+# what the build inputs are -- the release workflow's source mirror, most of all
+# -- must ask this list rather than glob sources/, which also holds extracted
+# trees and whatever a local experiment left behind.
+#
+#      url | sha256 | destination
+PINS="\
+https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/IosevkaTerm.tar.xz|cad9da572d25e3413f7a15a319d2f3c9e7e915ee016baa99e0d88fc08cf5b781|sources/cand/IosevkaTerm.tar.xz
+https://github.com/orioncactus/pretendard/releases/download/v1.3.9/PretendardJP-1.3.9.zip|8dab678c371a1530106ca643b76b2b80d47653d5ba670b01265b48e4c6615d63|sources/PretendardJP-1.3.9.zip
+https://raw.githubusercontent.com/google/fonts/$GF_MPLUS_COMMIT/ofl/mplus1p/MPLUS1p-Regular.ttf|2f294ad496432b1608f070d310e3aa2adcf1de4af429f4901df97ec4bd361ed1|sources/mplus1p/MPLUS1p-Regular.ttf
+https://raw.githubusercontent.com/google/fonts/$GF_MPLUS_COMMIT/ofl/mplus1p/MPLUS1p-Medium.ttf|28b2f52a40ae988064810b71d67e127df75a16e08d7df4e192d1006e4075394f|sources/mplus1p/MPLUS1p-Medium.ttf
+https://raw.githubusercontent.com/google/fonts/$GF_NOTO_COMMIT/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf|194018e6b2b293a7964f037b25c0249ce1418bc9ab3c971060a03aa57861e252|sources/notosanskr/NotoSansKR[wght].ttf
+"
+
 # --- helpers -----------------------------------------------------------------
 say() { printf '\033[1m==>\033[0m %s\n' "$*"; }
 
@@ -47,6 +66,15 @@ verify() {  # verify <file> <sha256>
     return 1
   fi
 }
+
+if [ "$LIST_ONLY" = 1 ]; then
+  while IFS='|' read -r _url _sha dest; do
+    [ -n "$dest" ] && printf '%s\n' "$dest"
+  done <<EOF
+$PINS
+EOF
+  exit 0
+fi
 
 fetch() {  # fetch <url> <sha256> <dest>
   local url=$1 sha=$2 dest=$3
@@ -70,23 +98,23 @@ fetch() {  # fetch <url> <sha256> <dest>
   mv "$dest.part" "$dest"
 }
 
-# --- 1. Iosevka Term Nerd Font Mono -- Latin, symbols, Powerline --------------
-fetch \
-  "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/IosevkaTerm.tar.xz" \
-  cad9da572d25e3413f7a15a319d2f3c9e7e915ee016baa99e0d88fc08cf5b781 \
-  sources/cand/IosevkaTerm.tar.xz
+# --- 1. every pinned download -------------------------------------------------
+# Here-doc, not a pipe: a pipeline runs the loop in a subshell, where `set -e`
+# on a failed fetch would kill the subshell and let the build carry on with a
+# missing input.
+while IFS='|' read -r url sha dest; do
+  [ -n "$url" ] || continue
+  fetch "$url" "$sha" "$dest"
+done <<EOF
+$PINS
+EOF
 
+# --- 2. the two archives that need unpacking ----------------------------------
 if [ ! -f sources/cand/IosevkaTerm/IosevkaTermNerdFontMono-Regular.ttf ]; then
   say "extract IosevkaTerm"
   mkdir -p sources/cand/IosevkaTerm
   tar xJf sources/cand/IosevkaTerm.tar.xz -C sources/cand/IosevkaTerm
 fi
-
-# --- 2. Pretendard JP -- hangul, kana, han, fullwidth -------------------------
-fetch \
-  "https://github.com/orioncactus/pretendard/releases/download/v1.3.9/PretendardJP-1.3.9.zip" \
-  8dab678c371a1530106ca643b76b2b80d47653d5ba670b01265b48e4c6615d63 \
-  sources/PretendardJP-1.3.9.zip
 
 if [ ! -f sources/pjp/public/variable/PretendardJPVariable.ttf ]; then
   say "extract PretendardJP"
@@ -94,32 +122,14 @@ if [ ! -f sources/pjp/public/variable/PretendardJPVariable.ttf ]; then
   unzip -q -o sources/PretendardJP-1.3.9.zip -d sources/pjp
 fi
 
-# --- 3. M PLUS 1p -- the eighteen brackets, halfwidth kana, three signs -------
-# Regular drives the 400 weight and Medium the 700; both are build inputs.
-fetch \
-  "https://raw.githubusercontent.com/google/fonts/$GF_MPLUS_COMMIT/ofl/mplus1p/MPLUS1p-Regular.ttf" \
-  2f294ad496432b1608f070d310e3aa2adcf1de4af429f4901df97ec4bd361ed1 \
-  sources/mplus1p/MPLUS1p-Regular.ttf
-
-fetch \
-  "https://raw.githubusercontent.com/google/fonts/$GF_MPLUS_COMMIT/ofl/mplus1p/MPLUS1p-Medium.ttf" \
-  28b2f52a40ae988064810b71d67e127df75a16e08d7df4e192d1006e4075394f \
-  sources/mplus1p/MPLUS1p-Medium.ttf
-
-# --- 4. Noto Sans KR -- enclosed and squared blocks, archaic jamo -------------
-fetch \
-  "https://raw.githubusercontent.com/google/fonts/$GF_NOTO_COMMIT/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf" \
-  194018e6b2b293a7964f037b25c0249ce1418bc9ab3c971060a03aa57861e252 \
-  "sources/notosanskr/NotoSansKR[wght].ttf"
-
-# --- 5. the width provider ---------------------------------------------------
+# --- 3. the width provider ---------------------------------------------------
 # Pinned exactly in package.json: this table sets every advance in the font.
 if [ ! -d node_modules/@xterm/addon-unicode11 ]; then
   say "install the width provider"
   pnpm install --frozen-lockfile
 fi
 
-# --- 6. Iosevka source -- the parametric Latin --------------------------------
+# --- 4. Iosevka source -- the parametric Latin --------------------------------
 # Not a binary download: the shipping Latin is built from source with
 # latin/private-build-plans.toml. Pinned to a tag and asserted by commit,
 # because a tag can be moved and a commit cannot.

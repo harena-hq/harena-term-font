@@ -91,17 +91,36 @@ jobs:
       # Mirror the pinned inputs as release assets. A SHA-256 detects a changed
       # upstream; it cannot resurrect a deleted one, and the day any upstream
       # retires a release the reproducibility claim quietly becomes false.
-      # Every input is OFL and redistributable with its notice, and release
-      # assets never enter the clone. fetch_sources.sh reads
+      # Release assets never enter the clone, and fetch_sources.sh reads
       # HARENA_SOURCE_MIRROR to fall back to these.
+      #
+      # The list comes from fetch_sources.sh, never from globbing sources/.
+      # That directory also holds extracted trees, the Iosevka clone and
+      # whatever a local run left behind, so a glob would mirror files the build
+      # never reads while missing the authority entirely. Same rule as the width
+      # table driving the advances: ask the thing that knows.
+      #
+      # The notices travel with the bytes because they have to. The Iosevka Nerd
+      # Font archive carries icon sets that are MIT and CC-BY-4.0 rather than
+      # OFL, and two of them require attribution wherever they are redistributed.
       - name: Mirror the pinned sources
         run: |
           mkdir -p release/sources-mirror
-          find sources -maxdepth 2 -type f \
-            \( -name '*.zip' -o -name '*.ttf' -o -name '*.otf' \) \
-            -exec cp -n {} release/sources-mirror/ \;
+          scripts/fetch_sources.sh --list > pinned.txt
+          test -s pinned.txt || { echo "pin list is empty"; exit 1; }
+          while IFS= read -r f; do
+            [ -f "$f" ] || { echo "pinned file missing: $f"; exit 1; }
+            cp "$f" release/sources-mirror/
+          done < pinned.txt
+          cp OFL.txt THIRD_PARTY_NOTICES.md release/sources-mirror/
+          cp -r licenses release/sources-mirror/
+          # fetch_sources.sh looks the mirror up by basename, so the archive has
+          # to be flat. Assert that rather than assume it.
+          test "$(find release/sources-mirror -maxdepth 1 -type f | wc -l)" \
+             -eq "$(( $(wc -l < pinned.txt) + 2 ))"
           (cd release && zip -q -r HarenaTerm-sources-mirror.zip sources-mirror)
-          rm -rf release/sources-mirror
+          du -h release/HarenaTerm-sources-mirror.zip
+          rm -rf release/sources-mirror pinned.txt
 
       # Release notes come from the changelog entry for this tag, so the two
       # cannot disagree. Stops at the next heading *or* the first link
