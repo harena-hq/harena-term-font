@@ -1,0 +1,13 @@
+# Downloaded and generated. `fetch_sources.sh` reconstructs `sources/` from
+# pinned URLs and `build/` follows from it.
+sources/
+build/
+
+# The output. Fonts are release artefacts, not repository content: one `dist/`
+# is ~90 MB, and git cannot delta TTF outlines or brotli, so every release would
+# add its full size to every future clone. `SHA256SUMS` is what travels instead.
+dist/
+
+__pycache__/
+node_modules/
+.DS_Store
