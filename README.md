@@ -38,17 +38,21 @@ Each holds four faces: `Harena Term K` and `Harena Term J`, Regular and Bold.
 ## Install
 
 ```sh
-# macOS and Linux
+# macOS and Linux — downloads the latest release and installs it
 ./install/install-unix.sh
+
+./install/install-unix.sh --version v1.0.0   # a specific release
+./install/install-unix.sh --from dist        # fonts you built yourself
 ```
 
 ```powershell
 # Windows, from an elevated prompt
 .\install\install-windows.ps1
+.\install\install-windows.ps1 -From dist
 ```
 
-Both scripts install every TTF in `dist/`, or you can open the files and use the
-system font installer.
+Or unzip the release and use the system font installer — these scripts only save
+you the clicking.
 
 ## The two cuts: K and J
 

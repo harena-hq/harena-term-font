@@ -11,3 +11,8 @@ dist/
 __pycache__/
 node_modules/
 .DS_Store
+
+# Local scaffolding: these are directories, but a symlink to one is not
+# matched by a trailing-slash pattern.
+/sources
+/node_modules

@@ -37,17 +37,20 @@ Regular, Bold.
 ## 설치
 
 ```sh
-# macOS, Linux
+# macOS, Linux — 최신 배포본을 받아 설치합니다
 ./install/install-unix.sh
+
+./install/install-unix.sh --version v1.0.0   # 특정 버전
+./install/install-unix.sh --from dist        # 직접 빌드한 것
 ```
 
 ```powershell
 # Windows, 관리자 권한 프롬프트에서
 .\install\install-windows.ps1
+.\install\install-windows.ps1 -From dist
 ```
 
-두 스크립트 모두 `dist/`의 TTF를 전부 설치합니다. 파일을 열어 시스템 글꼴
-설치기를 써도 됩니다.
+압축을 풀어 시스템 글꼴 설치기를 써도 됩니다. 스크립트는 클릭을 줄여줄 뿐입니다.
 
 ## 두 벌: K와 J
 

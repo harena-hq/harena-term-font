@@ -13,6 +13,18 @@ its origin through every hand it passed through, [`docs/COVERAGE.md`](docs/COVER
 says which source drew each codepoint, and [`docs/adr/`](docs/adr/) holds the
 decisions that could be arrived at wrongly a second time.
 
+### Four counts, and they are not interchangeable
+
+Stated up front because three of them are within 5% of each other and reading
+one for another is the easiest mistake in this document.
+
+| | per face | what it counts |
+|---|---:|---|
+| glyphs | **38478** | `maxp.numGlyphs` — everything in the font |
+| hinted glyphs | **36859** | what ttfautohint instruments; composites and blanks are not among them |
+| codepoints | **37652** | entries in `cmap`; what a reader can actually type |
+| K/J divergence | **611** | codepoints whose outline differs between the two cuts |
+
 ---
 
 ## 1. Decisions

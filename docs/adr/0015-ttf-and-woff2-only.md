@@ -12,9 +12,9 @@ Two release artefacts: `HarenaTerm-ttf.zip` and `HarenaTerm-woff2.zip`.
 The outlines are TrueType quadratics, inherited from Iosevka and Pretendard and
 then hinted. Producing CFF is not a re-wrap, it is a different font:
 
-- **The hinting does not survive.** All 38478 glyphs are hinted with
-  ttfautohint ([0010](0010-ttfautohint-hints-y-only.md)), specifically so the
-  face holds up under ClearType. CFF uses a different hinting model; TrueType
+- **The hinting does not survive.** ttfautohint hints 36859 of the face's 38478
+  glyphs ([0010](0010-ttfautohint-hints-y-only.md)), specifically so the face
+  holds up under ClearType. CFF uses a different hinting model; TrueType
   instructions have nowhere to go. The Windows work would be discarded.
 - **Curve conversion is an approximation.** Quadratic to cubic moves points, so
   every measurement taken against the cell boundary has to be retaken — the
