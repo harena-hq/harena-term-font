@@ -1,0 +1,22 @@
+{
+  "name": "harena-term-widths",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pins the xterm.js width provider that drives every advance in Harena Term.",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.34.1",
+  "scripts": {
+    "widths": "node scripts/xterm_widths.mjs"
+  },
+  "dependencies": {
+    "@xterm/addon-unicode11": "0.8.0"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "@xterm/xterm"
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+# Pinned exactly, for the same reason every source archive is pinned: these
+# decide the bytes. The build compiles the fonts through fontTools and hints
+# them with ttfautohint, so an unpinned resolve here can change the output and
+# break the SHA256SUMS check for a reason that has nothing to do with the font.
+#
+# These are the versions the shipped binaries were built and verified with.
+fonttools==4.63.0
+ttfautohint-py==0.6.1
