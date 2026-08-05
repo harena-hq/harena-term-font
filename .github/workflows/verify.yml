@@ -1,0 +1,57 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6.0.10
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+      # libharfbuzz-bin supplies hb-shape. verify.py *skips* the NFD shaping
+      # check when it is absent rather than failing, so without this the gate
+      # would quietly run 145 checks and still report success.
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip xz-utils libharfbuzz-bin
+      - name: Fetch build sources
+        run: scripts/fetch_sources.sh
+      - name: Build fonts
+        run: python3 scripts/build.py
+      - name: Hint, compress and checksum
+        run: python3 scripts/postbuild.py
+      # The gate must run its full complement. A check that skips itself is the
+      # failure mode this project keeps rediscovering, so assert the count.
+      - name: Run conformance verification
+        run: python3 scripts/verify.py | tee gate.log && grep -q '^146/146 checks passed' gate.log
+      - name: Verify the build is reproducible
+        run: cd dist && sha256sum -c ../SHA256SUMS
+      # The gate and the hash check are what this workflow is for; the binaries
+      # themselves ship from Releases. Uploading 90 MB on every push would cost
+      # storage to duplicate what a tag already produces.
+      - name: Upload build artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: harena-term
+          path: dist/
+          retention-days: 7
+          if-no-files-found: error
