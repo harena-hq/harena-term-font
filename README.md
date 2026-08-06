@@ -3,7 +3,7 @@
 A terminal monospace font where Korean, Japanese and English are all first-class,
 on a strict 1:2 cell grid.
 
-*[한국어](README.ko.md)*
+**English** | [日本語](README.ja.md) | [한국어](README.ko.md)
 
 ![The same Korean text in Sarasa Term K and in Harena Term K, at the same cell width](docs/specimen.png)
 

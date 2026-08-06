@@ -2,7 +2,7 @@
 
 한글·일본어·영문이 모두 1급 시민인 터미널 고정폭 글꼴. 셀 격자는 정확히 1:2.
 
-*[English](README.md)*
+[English](README.md) | [日本語](README.ja.md) | **한국어**
 
 ![같은 한글 문장을 Sarasa Term K와 Harena Term K로, 같은 셀 너비에서 조판한 비교](docs/specimen.png)
 
