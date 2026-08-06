@@ -9,9 +9,30 @@ is the walking radical at the lower left of 運 進 週 選 過 達 連 遠 道 
 迎 逆 通 造 速 適 — Korean keeps its traditional two dots, the Japanese shinjitai
 uses one.
 
-(The radical itself, U+8FB5 and U+8FB6, is deliberately not in this font: it is
-outside Pretendard JP's 7138 han, and a document that names it would render tofu
-in the very face it describes.)
+**The radical itself is not in this font**, and naming it in prose is therefore
+a trap: U+8FB5 and U+8FB6 fall outside Pretendard JP's 7138 han, so a document
+that spells them out renders in a fallback face — or as tofu where no CJK
+fallback exists — in the very font it is describing. Every document here
+describes the radical through characters the font draws.
+
+It could be added. Measured, **Noto Sans KR draws both at exactly 1.000 em**,
+which satisfies [0013](0013-the-width-table-must-cover-what-the-build-declares.md)'s
+own rule — a glyph is imported when some source draws it at full width — and
+Noto is already a graft source here rather than a fourth letterform system, with
+the transform against our han already solved.
+
+Not done, because two glyphs do not pay for a release: changing any outline
+invalidates all eight hashes in `SHA256SUMS` and needs a new tag.
+
+**Trigger:** fold it into the next release that changes outlines anyway. The one
+already specified is
+[0014](0014-the-compensation-target-erases-the-source-relative-weighting.md),
+which rewrites every CJK glyph.
+
+Not to be confused with `☎ ☏ ♨`, which also appear in these documents and are
+also absent. Those are absent *on purpose* ([PLAN.md](../../PLAN.md) D8) and the
+documents name them in order to say so. A prose mention of a deliberately
+excluded glyph is not a coverage gap.
 
 Pretendard JP carries the Korean forms properly, declaring a `hani` script with a
 `KOR ` language system and shipping them in both `locl` (540 substitutions, 534
