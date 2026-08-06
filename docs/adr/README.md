@@ -10,7 +10,7 @@ alternatives that lost and why, and the mistakes that produced a rule.
 
 ## Grid and geometry
 
-| | |
+| ADR | decision |
 |---|---|
 | [0002](0002-advance-normalisation-is-an-identity.md) | Per-script advance normalisation reproduces the source's letterspacing **exactly**, because `T` is scale-invariant and Pretendard's advances are uniform within a script. Two scale groups follow from that. |
 | [0003](0003-stroke-weight-compensated-through-wght.md) | Two scales mean two stroke weights on one line. Compensated through the source's own `wght` axis, not by distorting outlines. The mechanism stands; the target it aimed at was replaced by 0014. |
@@ -19,14 +19,14 @@ alternatives that lost and why, and the mistakes that produced a rule.
 
 ## Sources
 
-| | |
+| ADR | decision |
 |---|---|
 | [0005](0005-cjk-source-stays-pretendard-jp.md) | Pretendard JP stays. Han coverage of 7138 is complete for practical Japanese and Korean. **M PLUS 1 Code is not a better fit**: a monospace source is no advantage when the build normalises advances, the kana have converged anyway, and it has 6 of the 18 brackets. |
 | [0006](0006-two-regional-cuts-with-ss05-baked-in.md) | Korean and Japanese cuts, with `ss05` baked into `cmap` because a terminal cannot reach an OpenType feature at runtime. 611 codepoints differ, all inside han, zero advance differences. |
 
 ## Correctness under real renderers
 
-| | |
+| ADR | decision |
 |---|---|
 | [0007](0007-the-font-composes-nfd-hangul-itself.md) | The font composes NFD hangul itself, through 11172 `ccmp` ligatures. **HarfBuzz cannot test this** — its Hangul shaper normalises before any lookup runs — and CoreText, which has no such shaper, draws the jamo stacked. Every Korean filename on macOS. |
 | [0008](0008-advances-are-driven-by-the-provider-table.md) | Advances are *driven* by the width provider's own table across all 21349 covered codepoints, not checked against a hand-written list. Zero mismatches becomes structural. Found 23 inherited defects a list would have missed. |
@@ -36,13 +36,13 @@ alternatives that lost and why, and the mistakes that produced a rule.
 
 ## Rendering
 
-| | |
+| ADR | decision |
 |---|---|
 | [0010](0010-ttfautohint-hints-y-only.md) | ttfautohint hints in **y only** — measured, horizontal strokes gain +21 to +36 and vertical strokes gain nothing. No `-a` value touches x, so that search space is closed. VTT is the tool that could, with the trigger recorded. |
 
 ## Distribution
 
-| | |
+| ADR | decision |
 |---|---|
 | [0016](0016-no-install-scripts.md) | **No install scripts.** One of the four reference repositories ships them; the two with the widest reach use package managers instead. The OS already installs a font, a package manager also handles upgrade and uninstall, and the download path coupled the project to its own URL shape — which failed silently, returning 404, for as long as the repository was private. The Windows script was shipped having never been executed. |
 | [0017](0017-windows-verified.md) | **Windows verified**, closing the last 1.0.0 condition. The 48-column frame's right edge lands on the same x for all eight rows — zero shear under DirectWrite — ambiguous width agrees with the terminal's default, NFD composes, box joins close, and Bold shares Regular's advances. A second round on the physical machine closed it at an em of **14 px**, in Windows Terminal and conhost both, after the first rendered at 200% because a Remote Desktop scale setting is not the scale it renders at. One platform difference found: conhost gives every conjoining jamo a cell, so NFD Korean runs wider there than the 2/0/0 the font declares and Windows Terminal honours. Word was not run. |
@@ -50,13 +50,13 @@ alternatives that lost and why, and the mistakes that produced a rule.
 
 ## Identity
 
-| | |
+| ADR | decision |
 |---|---|
 | [0011](0011-naming-harena-term.md) | `Harena Term K` / `Harena Term J`, vendor `HRNA`. What a name here must clear (`Pretendard` and `Source` are reserved), and the open risk that a commercial display face named Harena already exists. |
 
 ## Open
 
-| | |
+| ADR | decision |
 |---|---|
 | [0014](0014-the-compensation-target-erases-the-source-relative-weighting.md) | Compensating every script to the **Latin stem** divided out the relative weighting the source's designers built between scripts, and the gate asserted the flattened value rather than missing it. 0003's own `1.0533 → 1.1426` turns out to be `× 1920/1770` exactly — one drawing in two units, not a distortion to remove. Fixed by instancing the whole CJK at one source weight; ratio restored on both axes, and the horizontal one was never solved for. |
 

@@ -68,7 +68,7 @@ The captures are their own evidence for this, so it is measured rather than
 inferred from the reported settings — which is the point, since the reported
 settings were wrong.
 
-| | |
+| measurement | value |
 |---|---|
 | adjacent identical columns, ink only | **0.5%** |
 | adjacent identical rows, ink only | **1.8%** |

@@ -53,7 +53,7 @@ Ship two faces with the regional forms **baked into `cmap`**:
 
 611 codepoints of the 37652 covered render differently, all inside han:
 
-| | |
+| block | codepoints |
 |---|---|
 | CJK Unified | 537 |
 | CJK Compatibility Ideographs (U+F900–FA68) | 74 |

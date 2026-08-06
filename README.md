@@ -36,7 +36,7 @@ Grab the latest release from [**Releases**](../../releases/latest).
 > [known limitations](CHANGELOG.md#known) are listed, and each is a decision
 > with a record behind it. See [the road to 1.0](CHANGELOG.md#the-road-to-10).
 
-| | |
+| archive | for |
 |---|---|
 | `HarenaTerm-ttf.zip` | desktop — terminals, editors, word processors |
 | `HarenaTerm-woff2.zip` | web — browser-based terminals via `@font-face` |
@@ -74,7 +74,7 @@ language tag, and almost no native terminal tags runs by language either.
 
 So the regional forms are baked into `cmap` and two faces ship.
 
-| | |
+| face | who it is for |
 |---|---|
 | **Harena Term K** | Korean forms. Pick this for Korean text, or if you are unsure. |
 | **Harena Term J** | Japanese forms. Pick this if you read Japanese. |
@@ -89,7 +89,7 @@ them.
 **37652 codepoints** across **86 Unicode blocks**, 38478 glyphs per face. Full
 per-block attribution in [`docs/COVERAGE.md`](docs/COVERAGE.md).
 
-| | |
+| what | how much |
 |---|---|
 | hangul syllables | **11172** — complete, plus 67 conjoining jamo |
 | han | **7138** — JIS X 0208, cp932 and KS X 1001 complete |

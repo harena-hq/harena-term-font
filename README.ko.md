@@ -34,7 +34,7 @@ Harena Term은 각 문자 체계를 **고유 폭이 셀에 정확히 떨어지�
 > [알려진 한계](CHANGELOG.md#known)는 목록으로 있고, 각각은 실수가 아니라 기록을
 > 가진 결정입니다. [1.0까지의 길](CHANGELOG.md#the-road-to-10).
 
-| | |
+| 압축 파일 | 용도 |
 |---|---|
 | `HarenaTerm-ttf.zip` | 데스크톱 — 터미널, 편집기, 워드프로세서 |
 | `HarenaTerm-woff2.zip` | 웹 — `@font-face`로 브라우저 기반 터미널에 |
@@ -72,7 +72,7 @@ cp *.ttf ~/.local/share/fonts/ && fc-cache -f
 
 그래서 지역 자형을 `cmap`에 구워 넣고 두 벌을 배포합니다.
 
-| | |
+| 글꼴 | 어느 쪽을 고를까 |
 |---|---|
 | **Harena Term K** | 한국 자형. 한글 위주라면, 또는 잘 모르겠으면 이쪽. |
 | **Harena Term J** | 일본 자형. 일본어를 읽는다면 이쪽. |
@@ -86,7 +86,7 @@ cp *.ttf ~/.local/share/fonts/ && fc-cache -f
 **86개 유니코드 블록에 걸쳐 37652 코드포인트**, 한 벌당 38478 글리프. 블록별
 출처는 [`docs/COVERAGE.md`](docs/COVERAGE.md)에 전부 있습니다.
 
-| | |
+| 무엇 | 얼마나 |
 |---|---|
 | 한글 음절 | **11172자 완비**, 더해 조합형 자모 67자 |
 | 한자 | **7138자** — JIS X 0208, cp932, KS X 1001 완비 |
