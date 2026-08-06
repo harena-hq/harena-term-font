@@ -25,18 +25,15 @@ now closed**, in the tree above this release:
 3. **Windows verified** — TUI rendering with no column shear, including the
    Braille spinner and box-drawn frames. Run, measured off the captures, and
    recorded in [ADR 0017](docs/adr/0017-windows-verified.md) along with what it
-   does *not* settle: the captures were taken at roughly 22 px per em, and
+   does *not* settle: the Remote Desktop session ignored its own 100% scale
+   setting and rendered at 200%, putting the em at 29.5 px where
    ttfautohint's grid-fitting earns its keep below about 16.
 
-A third condition is now met: the release workflow has been exercised for real.
-Tagging v0.9.0 built the fonts on a clean runner from the pinned sources, ran
-the gate at 154/154, reproduced every hash in `SHA256SUMS`, and published — in
-17m45s. That is also what turned "byte-reproducible" from a claim into a
-checked fact, since until then it had only ever been verified on the machine
-that made the claim.
-
-Until the two above are closed, a version number that claims stability would be
-claiming something nobody has checked.
+On the first of those: tagging v0.9.0 built the fonts on a clean runner from the
+pinned sources, ran the gate, reproduced every hash in `SHA256SUMS` and
+published, in 17m45s. That is what turned "byte-reproducible" from a claim into
+a checked fact, since until then it had only ever been verified on the machine
+making the claim.
 
 ## [Unreleased]
 

@@ -9,7 +9,8 @@ Status: **accepted**. Closes the last of the three conditions
 |---|---|
 | terminal | Windows Terminal 1.24.11911.0, Windows PowerShell |
 | face | Harena Term K, Regular and Bold, from the ADR 0014 build |
-| reported | size 11, 100% scale, 2560 × 1600 |
+| reported | size 11, 100% scale, 2560 × 1600 — over Remote Desktop |
+| measured | em 29.5 device px, i.e. **200%**; see below |
 | method | `Get-Content -Encoding utf8 sample.txt`, three PNG captures |
 
 Nothing was installed but the four TTFs; the sample is `docs/sample.txt`
@@ -52,19 +53,38 @@ an engine that was not the one it was designed on.
 
 ## What it does not settle, and this is the honest part
 
-**The size the captures were taken at is not the size that was reported.** The
-PNGs are 3456 px wide for a 2560 px display, so they were resampled after
-capture. Correcting for that, the cell measures ~10.9 device px and the em
-~21.9. Size 11 at 96 DPI and 100% scale would put the em at 14.67. The ratio is
-1.49, which is what 150% display scaling produces — the near-universal setting
-for a 2560 × 1600 panel.
+**The size the captures were taken at is not the size that was set.** The
+session was a Remote Desktop one with its scaling set to 100%, but the setting
+did not reach the renderer: RDP forwards the *client's* scale factor, and the
+client's won.
+
+The captures are their own evidence for this, so it is measured rather than
+inferred from the reported settings — which is the point, since the reported
+settings were wrong.
+
+| | |
+|---|---|
+| adjacent identical columns, ink only | **0.5%** |
+| adjacent identical rows, ink only | **1.8%** |
+| stem profile across one row | `204 204 204 165 12` — one AA edge |
+
+A nearest-neighbour ×2 upscale would put both duplication figures near 50%, a
+×1.35 near 26%. At 0.5% the PNGs are **device pixels, not a resampled bitmap**,
+which makes the measurements below real rather than an artefact of the capture:
+the cell is 14.75 px and the em 29.5. Size 11 at 96 DPI gives an em of 14.67.
+The ratio is **2.00** — the session rendered DPI-aware at 200%.
+
+That also disposes of the reported 2560 × 1600: a 3456 px wide window cannot
+exist on a 2560 px desktop.
 
 That matters because **ttfautohint's grid-fitting is what
 [0010](0010-ttfautohint-hints-y-only.md) bought, and it earns its keep below
-about 16 px per em.** At 22 px there is enough room that hinting barely
-arbitrates. So the layout questions are closed at every size — advances are
-integers and do not care — while the *rendering* question is closed only for
-the size actually shown.
+about 16 px per em.** At 29.5 px — twice the size that was asked for — there is
+so much room that hinting barely arbitrates.
+
+So the split is clean. **Layout is closed at every size**, because advances are
+integers and do not care what the em is. **Rendering is closed only at the size
+shown**, and that size is the one where hinting matters least.
 
 Two smaller gaps, recorded rather than waved past:
 
