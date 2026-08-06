@@ -252,13 +252,10 @@ def verify(path: str, g: Gate) -> None:
                 "claimed, but coverage is well under half" if cp1 >> bit & 1 else "")
 
     # --- 3. density: the reason the project exists ----------------------
-    # The Conform variant traded spacing for proportion by design and needed a
-    # waiver here. It is retired to scripts/legacy/comparison_variants.py, so
-    # the waiver is gone and hangul is held to the target unconditionally.
-    conform = False
+    # This carried a waiver for the retired Conform cut, which traded spacing
+    # for proportion by design. One cut ships, so hangul is held to the target
+    # unconditionally and the waiver is gone rather than switched off.
     for script, (sample, target, tol) in DENSITY.items():
-        if conform and script == "hangul":
-            tol = 1.0        # this variant trades spacing for proportion by design
         vals = []
         for cp in sample:
             gname = cmap.get(cp)
@@ -280,7 +277,7 @@ def verify(path: str, g: Gate) -> None:
                 f"{script} letterspacing no looser than Pretendard's "
                 f"{target} +{tol:.0%}",
                 f"T={T:.4f}, {(T / target - 1):+.1%} (n={len(vals)})")
-        if script == "hangul" and not conform:
+        if script == "hangul":
             g.check(T < SARASA_HANGUL_T * 0.7,
                     "hangul is at least 30% tighter than Sarasa Term K",
                     f"T={T:.4f} vs Sarasa {SARASA_HANGUL_T} "

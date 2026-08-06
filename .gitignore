@@ -11,8 +11,11 @@ dist/
 __pycache__/
 node_modules/
 .DS_Store
+# Runtime state from the agent tooling, regenerated per session.
+.omc/
 
-# Local scaffolding: these are directories, but a symlink to one is not
-# matched by a trailing-slash pattern.
+# Kept alongside the trailing-slash patterns above, which do not match a
+# symlink. Both were symlinks into the pre-1.0 working tree until that tree was
+# archived; these patterns are what stopped them being committed.
 /sources
 /node_modules

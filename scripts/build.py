@@ -1022,8 +1022,9 @@ def main() -> None:
     ap.add_argument("--region", default="both", choices=["K", "J", "both"])
     ap.add_argument("--weight", default="400,700")
     ap.add_argument("--variant", default="ship",
-                    help="only 'ship' remains; the retired cuts are in "
-                         "scripts/legacy/comparison_variants.py")
+                    help="only 'ship' remains. The nine cuts weighed during "
+                         "the parameter search are closed, not shelved: what "
+                         "they settled is in the VARIANTS comment and ADR 0001")
     args = ap.parse_args()
 
     regions = ["K", "J"] if args.region == "both" else [args.region]
