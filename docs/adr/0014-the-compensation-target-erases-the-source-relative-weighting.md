@@ -1,12 +1,10 @@
 # 0014 — The compensation target erases the source's relative script weighting
 
-Status: **open**. Measured, reproduced, and deliberately not acted on in v0.9.0 —
-the change lands on top of a released baseline rather than inside the first
-release, for the reason given at the end.
+Status: **accepted and applied**, on top of v0.9.0. Measured there, deliberately
+not acted on there, and fixed in the tree that follows it.
 
-**This is one of the two things 1.0.0 is waiting on.** The other is Windows
-verification; the third condition, a real run of the release workflow, was met
-by v0.9.0.
+**The two things 1.0.0 waited on are now one: Windows verification.** The third
+condition, a real run of the release workflow, was met by v0.9.0.
 
 Reproduce with `python3 scripts/probe_script_weight.py`, from a tree where
 `fetch_sources.sh` has run and `dist/` is built.
@@ -162,23 +160,79 @@ says nothing about hangul beside **kana**, which is the pairing the katakana row
 above inverts — and that is the one a reader notices on screen, unprompted and
 without any measurement in front of them.
 
-## The change, specified but not made
+## The arithmetic that settles it
 
-1. Stop targeting the Latin stem for every script. Anchor one script to the
-   Latin and hold the **source's** ratios for the others. With hangul as the
-   anchor: han 0.881 of hangul, katakana 0.971, hiragana 0.982.
-2. Retarget the gate. It currently asserts `hangul stroke == han stroke` and
-   passes at 1.000x, so it does not merely miss this — **it enforces it.** An
-   assertion that locks in a defect is worse than an absent one.
-3. Add horizontal strokes to the gate. It measures vertical stems only, and
-   the largest divergences are horizontal.
+0003 records the hangul/han stroke ratio moving `native 1.0533 → uncompensated
+1.1426 → compensated 1.0000`, which reads as a scaling artefact being undone.
+It is not one:
 
-Deferred deliberately, and the reason is release hygiene rather than doubt about
-the measurement. v0.9.0 is byte-reproducible from pinned sources and gated at
-154/154. This change alters every CJK outline in all four faces and invalidates
-every hash in `SHA256SUMS`, so it belongs on top of a released baseline where the
-diff is attributable to one decision — not folded into a first release where it
-would be indistinguishable from everything else.
+```
+1.0533 × (1920 / 1770) = 1.1426          exact, not approximate
+```
+
+1920 and 1770 are the two scripts' source advances. **Those are the same drawing
+measured in two units** — 1.0533 against the em, 1.1426 against the advance —
+and [0002](0002-advance-normalisation-is-an-identity.md) already established
+that the advance is the unit that means anything here, because both advances
+land on the same cell. So "uncompensated 1.1426" was never a distortion to
+remove. It is Pretendard's own inter-script weighting, seen in the only unit
+that shows it. The compensation drove it to 1.0000 and called that precision.
+
+The correction follows from the same identity. If holding the source's ratio
+means expressing both groups at one source weight, then solving each group
+independently should land them on the same number. Solved — the vertical stem
+ratio on target, the page's overall colour held to v0.9.0 — it does:
+
+| | hangul `wght` | han/kana `wght` | apart |
+|---|---|---|---|
+| Regular | **439.9** | **440.6** | 0.16% |
+| Bold | **638.8** | **632.6** | 1.0% |
+
+against v0.9.0's 403.7/474.6 and 585.8/684.0, which are 18% and 17% apart. The
+two numbers are kept separate in `build.py` rather than merged, because they are
+solved independently and nothing guarantees they stay this close if the Latin,
+the scales or the source move.
+
+## The change, as made
+
+1. **One source weight for the CJK, not one target per script.** The Latin stem
+   is still what the CJK is fitted to, but as a body rather than script by
+   script. Stroke moves +6.5% on hangul and −6.2% on han/kana, so the page keeps
+   its colour and only the relationship between the scripts changes.
+2. **The gate retargeted.** `hangul stroke == han stroke` is gone. In its place
+   the ratio is asserted against Pretendard's own, per weight.
+3. **Horizontal strokes added to the gate**, on `ㅡ` against `一`. This was the
+   step most easily skipped and it is the one that proves the approach: the
+   horizontal ratio is *not* solved for, and it lands anyway.
+
+Measured on the shipped bytes, all four faces:
+
+| | vertical | source | horizontal | source |
+|---|---|---|---|---|
+| Regular | 1.1412 | 1.1426 | 0.9647 | 0.9690 |
+| Bold | 1.1391 | 1.1461 | 0.9386 | 0.9449 |
+
+Within 0.7% everywhere, on both axes. v0.9.0 sat at 1.0000/0.8652 and
+0.9919/0.8115 — the vertical erased, the horizontal 11–14% off with nothing
+watching it.
+
+Note the two axes point opposite ways: hangul verticals run 14% heavier than
+han's, its horizontals 3–6% lighter. A single number could never have expressed
+that, which is the structural reason the old check was wrong and not merely
+mis-valued.
+
+The gate is 158/158. Letterspacing improves as a side effect — han `T` −4.3% →
+−1.8% against Pretendard — because the correction moves ink rather than
+position.
+
+### Why it was deferred out of v0.9.0
+
+Release hygiene, not doubt about the measurement. v0.9.0 was byte-reproducible
+from pinned sources and gated at 154/154. This change alters every CJK outline
+in all four faces and invalidates every hash in `SHA256SUMS`, so it belongs on
+top of a released baseline where the diff is attributable to one decision —
+not folded into a first release where it would be indistinguishable from
+everything else.
 
 ## The recurring shape
 
@@ -187,3 +241,10 @@ the sharpest form of it: **a gate can assert the wrong thing.** The blind-spot
 cases are about ranges the authority never listed. This one is listed, measured,
 and asserted — at a value that erases a deliberate design decision. Passing at
 `1.000×` reads as precision. It is the defect, written down as a requirement.
+
+A second shape sits underneath it, and it is what hid the first for so long:
+**two numbers in different units, compared as though they shared one.** 1.0533
+and 1.1426 are one measurement, and reading their difference as damage done by
+the build is what made a design decision look like an artefact worth removing.
+The tell was available — 0002 had already ruled on which unit governs here —
+and 0003 simply did not apply its own conclusion one section later.

@@ -12,8 +12,10 @@ See PLAN.md for the decisions. In short:
     follow, since block elements must tile the cell exactly;
   * each CJK script is scaled so its own advance lands exactly on the two-cell
     box, which reproduces Pretendard's own letterspacing as an identity;
-  * because the scales differ per script, each script is instanced at the
-    `wght` that makes its post-scale stroke match the Latin stem.
+  * the CJK is then instanced at one source `wght`, chosen so the whole of it
+    sits against the Latin stem as a unit. Compensating each script separately
+    to that stem is what v0.9.0 did, and it divided out the weighting
+    Pretendard's designers built between the scripts -- see docs/adr/0014.
 
 The scale is derived from the source advance in font units rather than from the
 em-relative figure, so the advance lands on the cell exactly and no rounding
@@ -236,17 +238,23 @@ CUSTOM_UNHINTED = "sources/iosevka-src/dist/{plan}/TTF-Unhinted/{plan}-{style}.t
 VARIANTS = {
     # The shipping configuration, and the only one. Latin redrawn parametrically
     # at cap 808, shape 500 and sb 45; hangul x1.1571 and han/kana x1.0667 with
-    # the weight compensation of D3.
+    # the weight compensation of D3, retargeted per ADR 0014.
     #
     # One entry, because one cut ships. The parameter search behind it is in
     # latin/README.md and ADR 0001. Two axes closed on measurement rather than
     # preference: sb 40 -> 50 shifts the widest letters' gap by 0.02 em, which
     # is 0.26px at 13px, and cap 808 -> 760 changed no pixel above a 32/255
     # threshold.
+    # The two weights below are 0.16% apart at Regular and 1.0% at Bold, and
+    # that is the finding rather than an accident worth tidying: holding
+    # Pretendard's own inter-script weighting *is* instancing every script at
+    # one source weight. They are not merged into a single number because the
+    # two groups are solved independently and nothing guarantees they stay this
+    # close if the Latin, the scales or the source change. See docs/adr/0014.
     "ship": dict(label="", latin="custom", plan="HarenaLatin",
                 hscale={400: None, 700: 1.1362}, yscale=None,
-                wght={400: 403.7, 700: 585.8},
-                han_wght={400: 474.6, 700: 684.0}),
+                wght={400: 439.9, 700: 638.8},
+                han_wght={400: 440.6, 700: 632.6}),
 }
 
 

@@ -61,6 +61,20 @@ DENSITY = {
 
 SARASA_HANGUL_T = 0.264
 
+# Pretendard's own hangul/han stroke ratio, each script normalised by its own
+# advance -- which is exactly what this build must reproduce, since both
+# advances land on the same cell here. Vertical is ㅣ against 丨 and horizontal
+# ㅡ against 一, single-stroke glyphs where an ink dimension is the stroke.
+#
+# The two point opposite ways: hangul verticals run 14% heavier than han's, its
+# horizontals 3-6% lighter. No single number could have stood in for both, and
+# the check these replace asserted one number for one axis -- at a value that
+# erased the relationship rather than holding it. See docs/adr/0014.
+SOURCE_STROKE_RATIO = {
+    "Regular": {"vertical": 1.1426, "horizontal": 0.9690},
+    "Bold": {"vertical": 1.1461, "horizontal": 0.9449},
+}
+
 
 class Gate:
     def __init__(self) -> None:
@@ -93,6 +107,18 @@ def ink_width(gs, hmtx, gname, upm):
     if not p.bounds:
         return None
     return (p.bounds[2] - p.bounds[0]) / upm
+
+
+def bar(font, upm, ch, gs=None):
+    """Horizontal counterpart to `stem`: the ink *height* of a single
+    horizontal stroke, which is that stroke's weight."""
+    gs = gs or font.getGlyphSet()
+    gn = font.getBestCmap().get(ord(ch))
+    if not gn:
+        return None
+    p = BoundsPen(gs)
+    gs[gn].draw(p)
+    return (p.bounds[3] - p.bounds[1]) / upm if p.bounds else None
 
 
 def stem(font, upm, ch, gs=None):
@@ -244,8 +270,15 @@ def verify(path: str, g: Gate) -> None:
             box = hmtx[gname][0] / upm
             vals.append((box - w) / w)
         T = sum(vals) / len(vals)
+        # One-sided on purpose, and the message now says so. Looser than the
+        # source is the defect this project exists to remove; tighter is the
+        # direction of travel, and what bounds it is the cell-clearance check
+        # rather than a floor here. The label used to read "within 10%", which
+        # announces a two-sided band that was never asserted -- Bold han passes
+        # at -21.1%.
         g.check(T <= target * (1 + tol),
-                f"{script} letterspacing within {tol:.0%} of Pretendard's {target}",
+                f"{script} letterspacing no looser than Pretendard's "
+                f"{target} +{tol:.0%}",
                 f"T={T:.4f}, {(T / target - 1):+.1%} (n={len(vals)})")
         if script == "hangul" and not conform:
             g.check(T < SARASA_HANGUL_T * 0.7,
@@ -437,19 +470,38 @@ def verify(path: str, g: Gate) -> None:
     g.check(same, "vertical metrics identical to the Latin base",
             os.path.basename(base_path))
 
-    # --- 6. stroke weight parity ----------------------------------------
+    # --- 6. stroke weight ------------------------------------------------
+    # Two different requirements, and conflating them is what ADR 0014 is
+    # about. Against the Latin, the CJK must not read as a second colour on a
+    # mixed line -- that is the 8% band, and it applies to the CJK as a whole.
+    # Between the CJK scripts, the requirement is the opposite of parity: the
+    # source draws hangul heavier than han on purpose, because hangul carries
+    # fewer strokes per glyph and would otherwise read as a hole in the page.
+    # This gate used to assert that those two were equal, so it did not merely
+    # miss the erasure -- it required it.
     latin_stem = stem(f, upm, "|", gs)
     hangul_stem = stem(f, upm, "ㅣ", gs)
     han_stem = stem(f, upm, "丨", gs)
+    hangul_bar = bar(f, upm, "ㅡ", gs)
+    han_bar = bar(f, upm, "一", gs)
     if hangul_stem and han_stem and latin_stem:
         for label, s in (("hangul", hangul_stem), ("han", han_stem)):
             r = s / latin_stem
             g.check(0.92 <= r <= 1.08,
                     f"{label} stroke within 8% of the Latin stem",
                     f"{r:.3f}x")
-        r = hangul_stem / han_stem
-        g.check(0.94 <= r <= 1.06, "hangul and han strokes match each other",
-                f"{r:.3f}x")
+    if hangul_stem and han_stem and hangul_bar and han_bar:
+        want = SOURCE_STROKE_RATIO[style]
+        # 5%, because the build has one `wght` per group and the two axes are
+        # not independently reachable: the vertical ratio is solved and the
+        # horizontal follows. Measured, it follows to within 2%.
+        for axis, ours, target in (
+                ("vertical", hangul_stem / han_stem, want["vertical"]),
+                ("horizontal", hangul_bar / han_bar, want["horizontal"])):
+            g.check(abs(ours / target - 1) <= 0.05,
+                    f"hangul/han {axis} stroke ratio holds Pretendard's "
+                    f"{target}",
+                    f"{ours:.4f}, {(ours / target - 1):+.1%}")
     # --- 7. the two regional cuts differ only in han --------------------
     # PLAN.md D5 claims it; assert it. ss05 also re-cuts punctuation, and its
     # bracket alternates are proportional `.hang` forms that do not belong in a

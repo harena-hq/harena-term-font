@@ -13,7 +13,7 @@ alternatives that lost and why, and the mistakes that produced a rule.
 | | |
 |---|---|
 | [0002](0002-advance-normalisation-is-an-identity.md) | Per-script advance normalisation reproduces the source's letterspacing **exactly**, because `T` is scale-invariant and Pretendard's advances are uniform within a script. Two scale groups follow from that. |
-| [0003](0003-stroke-weight-compensated-through-wght.md) | Two scales mean two stroke weights on one line. Compensated through the source's own `wght` axis, not by distorting outlines. |
+| [0003](0003-stroke-weight-compensated-through-wght.md) | Two scales mean two stroke weights on one line. Compensated through the source's own `wght` axis, not by distorting outlines. The mechanism stands; the target it aimed at was replaced by 0014. |
 | [0004](0004-latin-advance-sets-the-hangul-ceiling.md) | `fill = R × (cap/2a) × (ink_w/ink_h)`. The Latin advance is a **ceiling** on hangul density, so a 0.600 base is structurally excluded no matter how well its letterforms match. |
 | [0001](0001-latin-spacing-reopened.md) | The Latin's letterspacing is set through `metricOverride.sb`, which redraws at unchanged stroke weight. Scaling it instead thickens the strokes past a box-drawing frame that cannot follow. |
 
@@ -45,7 +45,7 @@ alternatives that lost and why, and the mistakes that produced a rule.
 | | |
 |---|---|
 | [0016](0016-no-install-scripts.md) | **No install scripts.** One of the four reference repositories ships them; the two with the widest reach use package managers instead. The OS already installs a font, a package manager also handles upgrade and uninstall, and the download path coupled the project to its own URL shape — which failed silently, returning 404, for as long as the repository was private. The Windows script was shipped having never been executed. |
-| [0015](0015-ttf-and-woff2-only.md) | TTF and WOFF2 only. OTF is declined structurally — CFF discards the ttfautohint work on all 36859 hinted glyphs, curve conversion moves points the cell measurements have no room for, and the 154 checks read `glyf`. TTC is declined on arithmetic: a collection shares byte-identical **tables**, not glyphs, and 611 differing glyphs keep all 17.66 MB of `glyf` duplicated — **0.6% saved**. |
+| [0015](0015-ttf-and-woff2-only.md) | TTF and WOFF2 only. OTF is declined structurally — CFF discards the ttfautohint work on all 36859 hinted glyphs, curve conversion moves points the cell measurements have no room for, and the 158 checks read `glyf`. TTC is declined on arithmetic: a collection shares byte-identical **tables**, not glyphs, and 611 differing glyphs keep all 17.66 MB of `glyf` duplicated — **0.6% saved**. |
 
 ## Identity
 
@@ -57,7 +57,7 @@ alternatives that lost and why, and the mistakes that produced a rule.
 
 | | |
 |---|---|
-| [0014](0014-the-compensation-target-erases-the-source-relative-weighting.md) | Compensating every script to the **Latin stem** divides out the relative weighting the source's designers built between scripts. Pretendard draws hangul 13.5–15.3% heavier than han; this build flattens it to ~1% and inverts katakana against hangul (0.971 → 1.130). Measured on 225 glyphs. Lands on top of v0.9.0, and is one of the three things 1.0.0 waits on. |
+| [0014](0014-the-compensation-target-erases-the-source-relative-weighting.md) | Compensating every script to the **Latin stem** divided out the relative weighting the source's designers built between scripts, and the gate asserted the flattened value rather than missing it. 0003's own `1.0533 → 1.1426` turns out to be `× 1920/1770` exactly — one drawing in two units, not a distortion to remove. Fixed by instancing the whole CJK at one source weight; ratio restored on both axes, and the horizontal one was never solved for. |
 
 ## Recurring shapes
 

@@ -44,7 +44,7 @@ documented install command returned 404 and nothing in the build could notice.
 **The Windows script was never executed.** Sixty-five lines writing to
 `HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts` and the user's font
 directory, shipped without ever being run, because no PowerShell was available
-where it was written. This project gates the font with 154 assertions and was
+where it was written. This project gates the font with 158 assertions and was
 shipping unverified code that mutates a reader's machine. The asymmetry is the
 argument: a defect in the font renders badly, a defect in an installer breaks
 something that is not ours.

@@ -13,9 +13,11 @@ Each block says what to look at. Set your terminal to this font first.
 뚫훓쫓빻꿇렬끓쏟짧웅쌍핥읊꽃잎쐐횃뷁훽쒫뾹      ← densest syllables; check for collisions
 
 ────────────────────────────────────────────────────────────────────────────────
-2. HANGUL BESIDE KANA — the known open defect (ADR 0014)
-   Hangul should not look lighter or smaller than the kana next to it.
-   If the kana reads heavier, that is the defect, not your eyes.
+2. HANGUL BESIDE KANA — fixed in this build, and worth checking (ADR 0014)
+   Hangul should read slightly heavier than the kana beside it, the way
+   Pretendard draws it. v0.9.0 had this the wrong way round. Kana still
+   looks a little larger — it is drawn wide and carries fewer strokes —
+   but it should no longer look bolder.
 
 설치 セットアップ 완료 しました 확인 かくにん
 로그인 ログイン 되었습니다 サーバー 응답 レスポンス

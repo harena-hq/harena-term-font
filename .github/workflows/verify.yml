@@ -45,7 +45,7 @@ jobs:
       # The gate must run its full complement. A check that skips itself is the
       # failure mode this project keeps rediscovering, so assert the count.
       - name: Run conformance verification
-        run: python3 scripts/verify.py | tee gate.log && grep -q '^154/154 checks passed' gate.log
+        run: python3 scripts/verify.py | tee gate.log && grep -q '^158/158 checks passed' gate.log
       - name: Verify the build is reproducible
         run: cd dist && sha256sum -c ../SHA256SUMS
       # The gate and the hash check are what this workflow is for; the binaries

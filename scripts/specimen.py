@@ -5,13 +5,19 @@
 
 The whole project rests on one claim -- that hangul in a monospace terminal is
 set far looser than the source designer drew it, and that it does not have to
-be. That claim is visual. A paragraph about T = 0.1308 against 0.264 does not
+be. That claim is visual. A paragraph about T = 0.1260 against 0.264 does not
 land; two panels of the same Korean text at the same cell width do.
 
 The reference face is not fetched by scripts/fetch_sources.sh, because it is not
-a build input -- it is only a comparison. Pass it explicitly:
+a build input -- it is only a comparison. Pass it explicitly, with the labels the
+committed image carries. They are arguments rather than defaults, so the whole
+invocation belongs here: without it the next regeneration silently relabels the
+reference panel.
 
-    python3 scripts/specimen.py --against /path/to/SarasaTermK-Regular.ttf
+    python3 scripts/specimen.py \
+      --against /path/to/SarasaTermK-Regular.ttf \
+      --against-label "Sarasa Term K" \
+      --against-note "hangul gap/ink T = 0.264 — set by the grid, not by the designer"
 
 The output is committed to the repository, so a reader does not need the
 reference face to see the argument.
@@ -91,7 +97,7 @@ def main():
     if args.against:
         panels.append((args.against_label, args.against, args.against_note, DIM))
     panels.append(("Harena Term K", OURS,
-                   "hangul gap/ink T = 0.1308 — Pretendard's own spacing", OK))
+                   "hangul gap/ink T = 0.1260 — Pretendard's own spacing", OK))
 
     pw = 42 * CELL + 46
     W = PAD * 2 + pw * len(panels)

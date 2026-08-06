@@ -80,7 +80,8 @@ is an identity, not an approximation.
 | kana | ×1.0667 | 0.1871 | **0.1871** |
 
 Against Sarasa Term K's hangul `T` of **0.264**, the shipped face measures
-**0.1308 — 50% tighter** — even after the weight compensation of D3.
+**0.1260 — 52% tighter** — and the weight compensation of D3 now tightens it
+further rather than loosening it, since 0014 instances hangul heavier.
 
 **Rejected — one uniform ×1.0667 for all CJK.** Tempting: one scale group,
 Pretendard's inter-script proportions untouched, hangul height barely moving. But
@@ -104,15 +105,13 @@ Reference stem: Iosevka's `|` at 0.0780 em Regular, 0.1120 em Bold.
 | hangul | ×1.1571 | **403.7** | **585.8** |
 | han / kana | ×1.0667 | **474.6** | **684.0** |
 
-hangul/han stroke ratio: native 1.0533 → uncompensated 1.1426 → **compensated
-1.0000**. Cost to the first priority is +5.9% on hangul `T`, which still leaves
-the shipped face 50% tighter than Sarasa. See
-[ADR 0003](docs/adr/0003-stroke-weight-compensated-through-wght.md).
-
-**This target is under review.** Matching every script to the Latin stem divides
-out the relative weighting Pretendard's designers built *between* scripts — they
-draw hangul 13.5% heavier than han deliberately, so that a script with fewer
-strokes per glyph reads at the same grayness. See
+**Retargeted by 0014, and the table above is v0.9.0's.** Matching every script
+to the Latin stem divided out the relative weighting Pretendard's designers built
+*between* scripts — they draw hangul 13.5% heavier than han deliberately, so that
+a script with fewer strokes per glyph reads at the same grayness. The shipping
+values are now one source weight for the whole CJK: hangul 439.9/638.8, han/kana
+440.6/632.6. Measured hangul/han ratio 1.1412 vertical and 0.9647 horizontal
+against Pretendard's 1.1426 and 0.9690, and hangul `T` tightens to 0.1260. See
 [ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md),
 which is open and specifies the change.
 
@@ -205,7 +204,7 @@ fallback beats a glyph that renders faint.
 ## 2. Done-when
 
 Automated, in [`scripts/verify.py`](scripts/verify.py), **asserting rather than
-reporting** — the exit code is the gate. Status: **154/154 across all four
+reporting** — the exit code is the gate. Status: **158/158 across all four
 faces.**
 
 1. every CJK advance is exactly 2× the Latin advance; every half-width glyph exactly 1×
@@ -215,13 +214,15 @@ faces.**
    table omits is a range the build silently skips
 4. coverage: hangul 11172, kana ≥182, han ≥7138, box 128, block 32, geometric 96,
    Braille **256**, arrows 112, Powerline ≥38
-5. per-script measured `T` within 10% of Pretendard's own — measured hangul
-   0.1308 (+1.7%), han 0.0885 (−4.3%) — and hangul at least 30% tighter than
-   Sarasa (measured **50% tighter**)
+5. per-script measured `T` no looser than Pretendard's own +10% — measured
+   hangul 0.1260 (−2.1%), han 0.0908 (−1.8%) — and hangul at least 30% tighter
+   than Sarasa (measured **52% tighter**)
 6. no full-width glyph exceeds its cell, scanned exhaustively across every
    full-width range — never sampled
 7. vertical metrics identical to the Iosevka base
-8. hangul, han and Latin stems within 8% of each other (see D3's caveat)
+8. hangul and han stems within 8% of the Latin stem, and the hangul/han ratio
+   holding Pretendard's own on **both** axes — vertical and horizontal, which
+   point opposite ways (see D3 and ADR 0014)
 9. `OS/2` declares all nine CJK blocks and codepages 949 and 932, and does **not**
    declare 936 or 950
 10. K and J differ only inside the han range

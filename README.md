@@ -14,7 +14,7 @@ proportional Pretendard sits at `0.1287`, more than twice as loose.
 
 Harena Term scales each script so that its **native advance lands exactly on the
 cell**, which reproduces that script's own letterspacing as an identity rather
-than an approximation. Measured on the shipped face: hangul `T = 0.1308`, **50%
+than an approximation. Measured on the shipped face: hangul `T = 0.1260`, **52%
 tighter than Sarasa**, inside a grid that is still exactly 1:2.
 
 It is built by merging [Iosevka Term Nerd Font Mono](https://github.com/be5invis/Iosevka)
@@ -28,13 +28,13 @@ covers at full width.
 
 Grab the latest release from [**Releases**](../../releases/latest).
 
-> **This is 0.9.0, and the version number is deliberate.** The font is complete,
-> gated, and byte-reproducible on a clean CI runner. Two things are still
-> unchecked: one measured weighting defect
-> ([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md))
-> and Windows. See [why 0.x](CHANGELOG.md#why-0x). Nothing here is expected to
-> move your text — advances and metrics are asserted by the gate — but the CJK
-> stroke weights will change before 1.0.
+> **This is 0.x, and the version number is deliberate.** The font is complete,
+> gated, and byte-reproducible on a clean CI runner. The weighting defect that
+> 0.9.0 shipped with is fixed in this tree — see
+> [ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md),
+> and note that the gate had been asserting the defect rather than missing it.
+> One thing is still unchecked: **Windows**, on a font whose whole subject is
+> terminals. See [why 0.x](CHANGELOG.md#why-0x).
 
 | | |
 |---|---|
@@ -131,12 +131,12 @@ cd dist && sha256sum -c ../SHA256SUMS
 ```
 
 `verify.py` **asserts rather than reports** — its exit code is the gate, and it
-runs **154 checks** across all four faces: every advance re-derived from the
+runs **158 checks** across all four faces: every advance re-derived from the
 binary and checked against the width provider across all 21349 covered
 codepoints, every full-width glyph scanned for cell overflow, all 11172 NFD
-syllables walked through the `ccmp` ligature tree, letterspacing measured against
-Pretendard's own, `OS/2` script declarations, and the reproducibility stamp on
-the shipped bytes.
+syllables walked through the `ccmp` ligature tree, letterspacing and the
+hangul-to-han stroke ratio measured against Pretendard's own, `OS/2` script
+declarations, and the reproducibility stamp on the shipped bytes.
 
 Set `SOURCE_DATE_EPOCH` to override the build stamp. CI runs the whole sequence
 and checks the hashes on every push.

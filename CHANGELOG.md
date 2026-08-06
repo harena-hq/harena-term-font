@@ -16,13 +16,15 @@ and this file cannot disagree.
 ### Why 0.x
 
 The font is complete, gated and reproducible, and it is still below 1.0 on
-purpose. **1.0.0 waits on two things**, both recorded rather than vague:
+purpose. **1.0.0 now waits on one thing**, recorded rather than vague:
 
-1. **[ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)
-   resolved** — fixed, or accepted with a written rationale. Fixing it changes
-   every CJK outline, which 0.x permits in a minor bump and 1.x would not.
-2. **Windows verified** — TUI rendering with no column shear, including the
+1. **Windows verified** — TUI rendering with no column shear, including the
    Braille spinner and box-drawn frames. Never run, and this is a terminal font.
+
+The other condition,
+[ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md),
+is closed: fixed in the tree above this release, which is exactly the CJK-wide
+outline change 0.x permits in a minor bump and 1.x would not.
 
 A third condition is now met: the release workflow has been exercised for real.
 Tagging v0.9.0 built the fonts on a clean runner from the pinned sources, ran
@@ -35,6 +37,34 @@ Until the two above are closed, a version number that claims stability would be
 claiming something nobody has checked.
 
 ## [Unreleased]
+
+### Changed
+
+- **The CJK is now weighted as one body against the Latin, not script by
+  script.** v0.9.0 solved a source `wght` per script so each matched the Latin
+  stem, which divided out the weighting Pretendard's designers built *between*
+  the scripts — hangul is drawn heavier than han on purpose, because it carries
+  fewer strokes per glyph and would otherwise read as a hole in the page. The
+  build now instances the whole CJK at one source weight, solved so the page
+  keeps its colour: stroke +6.5% on hangul, −6.2% on han/kana. **Every CJK
+  outline changes and every hash in `SHA256SUMS` is new.** Hangul letterspacing
+  tightens as a side effect, `T` 0.1308 → 0.1260, and han's improves from −4.3%
+  to −1.8% against Pretendard's own.
+  See [ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md).
+- **README is now in three languages** — English, 日本語, 한국어 — with the same
+  switcher in each.
+
+### Fixed
+
+- **The gate was asserting the defect above, not missing it.** It required
+  `hangul stroke == han stroke` and passed at 1.000×. It now asserts the
+  source's own ratio per weight, and on **both** axes: the two point opposite
+  ways — hangul verticals run 14% heavier than han's, its horizontals 3–6%
+  lighter — so no single number could ever have covered it. 154 checks → 158.
+- **A gate message that claimed more than the gate asserted.** The
+  letterspacing check reads `T <= target × 1.1`, one-sided by design, but was
+  labelled "within 10% of Pretendard's" — a two-sided band. Bold han passes it
+  at −21.1%. The label now says "no looser than".
 
 ### Removed
 

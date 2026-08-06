@@ -79,8 +79,12 @@ space rather than distorting outlines:
 | hangul | ×1.1571 | 403.7 | 585.8 |
 | han / kana | ×1.0667 | 474.6 | 684.0 |
 
-Result: hangul/han stroke ratio 1.0533 native → 1.1426 uncompensated →
-**1.0000**. Cost is +5.9% on hangul `T`, still 48% tighter than Sarasa. Bold
+Result in v0.9.0: hangul/han stroke ratio 1.0533 native → 1.1426 uncompensated
+→ **1.0000**, at a cost of +5.9% on hangul `T`. That target was wrong — the
+1.1426 is the source's own weighting rather than a scaling artefact — and
+[ADR 0014](adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)
+replaced it with one source weight for the whole CJK: hangul 439.9/638.8,
+han/kana 440.6/632.6, ratio restored to 1.1412 and `T` tightened to 0.1260. Bold
 hangul additionally takes ×1.1362 horizontally, because added weight pushed the
 widest syllables (썞 쌦 쏎) into contact with the cell wall. See
 [ADR 0003](adr/0003-stroke-weight-compensated-through-wght.md).
