@@ -1,8 +1,21 @@
 # Pinned exactly, for the same reason every source archive is pinned: these
-# decide the bytes. The build compiles the fonts through fontTools and hints
-# them with ttfautohint, so an unpinned resolve here can change the output and
-# break the SHA256SUMS check for a reason that has nothing to do with the font.
+# decide the bytes. The build compiles the fonts through fontTools, hints them
+# with ttfautohint and compresses the WOFF2 with brotli, so an unpinned resolve
+# here changes the output and breaks the SHA256SUMS check for a reason that has
+# nothing to do with the font.
 #
-# These are the versions the shipped binaries were built and verified with.
+# brotli is not an optional extra. fontTools calls
+# `brotli.compress(fontData, mode=brotli.MODE_FONT)` to write WOFF2 and raises
+# ImportError without it, so half the artefacts cannot be produced at all. And
+# the version is load-bearing rather than hygiene: measured, 1.1.0 and 1.2.0
+# compress the same input to different bytes, so an unpinned brotli invalidates
+# four of the eight hashes on its own.
+#
+# zopfli is deliberately absent. fontTools uses it for WOFF1, which this project
+# does not ship; verified that the whole pipeline runs without it.
+#
+# These are the versions the shipped binaries were built and verified with, in a
+# virtualenv holding nothing but this file.
 fonttools==4.63.0
+brotli==1.2.0
 ttfautohint-py==0.6.1
