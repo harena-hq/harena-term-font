@@ -1,7 +1,11 @@
 name: verify
 
+# Branches only. An unfiltered `push` also matches tags, so every release ran
+# this ~18-minute build a second time alongside release.yml, which already
+# performs the identical fetch, build, gate and hash check before publishing.
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
