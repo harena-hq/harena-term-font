@@ -123,19 +123,17 @@ jobs:
           rm -rf release/sources-mirror pinned.txt
 
       # Release notes come from the changelog entry for this tag, so the two
-      # cannot disagree. Stops at the next heading *or* the first link
-      # definition -- the newest entry has no heading after it, and a range
-      # that only looks for one runs to the end of the file.
+      # cannot disagree. The script also reflows and absolutises, because a
+      # release body is rendered with hard breaks and does not resolve relative
+      # links -- see its docstring. Doing it here rather than by hand is the
+      # point: v0.9.0 and v1.0.0 both shipped ragged notes with 404 links.
       - name: Extract release notes
         env:
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          awk -v tag="${TAG#v}" '
-            $0 ~ "^## \\[" tag "\\]" { p=1; next }
-            p && (/^## / || /^\[[^]]+\]: /) { exit }
-            p { print }
-          ' CHANGELOG.md > release-notes.md
-          test -s release-notes.md || { echo "no CHANGELOG entry for $TAG"; exit 1; }
+          python3 scripts/release_notes.py "${TAG#v}" --ref "$TAG" \
+            --out release-notes.md
           cat release-notes.md
 
       - name: Publish
