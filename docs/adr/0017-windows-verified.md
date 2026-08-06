@@ -5,13 +5,19 @@ Status: **accepted**. Closes the last of the three conditions
 
 ## What was run
 
-| | |
-|---|---|
-| terminal | Windows Terminal 1.24.11911.0, Windows PowerShell |
-| face | Harena Term K, Regular and Bold, from the ADR 0014 build |
-| reported | size 11, 100% scale, 2560 × 1600 — over Remote Desktop |
-| measured | em 29.5 device px, i.e. **200%**; see below |
-| method | `Get-Content -Encoding utf8 sample.txt`, three PNG captures |
+Two rounds. The first was over Remote Desktop and did not render at the size it
+reported; the second, on the physical machine, did.
+
+| | round 1 | round 2 |
+|---|---|---|
+| terminal | Windows Terminal 1.24.11911.0 | the same, **plus conhost** |
+| host | Windows PowerShell | Windows PowerShell, and `cmd` |
+| reported | size 11, 100% scale, 2560 × 1600 | 2560 × 1600 |
+| **measured em** | **29.5 px** — i.e. 200% | **14 px** — the size that matters |
+
+Face: Harena Term K, Regular and Bold, from the ADR 0014 build. Nothing was
+installed but the four TTFs; the sample is `docs/sample.txt` verbatim, read with
+`Get-Content -Encoding utf8` and, in conhost, after `chcp 65001`.
 
 Nothing was installed but the four TTFs; the sample is `docs/sample.txt`
 verbatim.
@@ -86,24 +92,58 @@ So the split is clean. **Layout is closed at every size**, because advances are
 integers and do not care what the em is. **Rendering is closed only at the size
 shown**, and that size is the one where hinting matters least.
 
-Two smaller gaps, recorded rather than waved past:
+### Round two closed it
 
-- **conhost (GDI) was not run.** ttfautohint's default `-a qsq` gives GDI the
-  strong mode and DirectWrite the quantized one, so they are deliberately not
-  the same rendering. Only the second was seen. The first attempt mojibaked,
-  which is worth recording because it looks like a font defect and is not one:
-  conhost decodes output with the system ANSI code page — 949 on a Korean
-  install — and this sample is UTF-8. `chcp 65001` first. The sample now says
-  so in its own header. Telling a reader to run a file that garbles on the
-  platform's default console is an instruction that fails in a way that blames
-  the font.
+A second set was taken on the physical machine rather than over Remote Desktop,
+and the cell measures **7 px — an em of 14**, which is where ttfautohint
+arbitrates. It renders cleanly: stems land without dropout, horizontals stay
+separate, and hangul still reads heavier than the kana beside it, so 0014's fix
+survives down to the size a terminal is actually used at. The densest syllables
+(`뚫훓쫓빻꿇`) do crowd, but that is 14 px arithmetic rather than a hinting
+failure — there are not enough pixels for four strokes and a doubled final.
+
+The grid holds at this size too, in **both** terminals: the 48-column frame's
+right edge lands on one x across every inner row — 117 of them in Windows
+Terminal, 94 in conhost.
+
+Which leaves one gap rather than two:
+
 - **Word was not run.** The `OS/2` codepage bits are asserted by the gate and
   their point is that Word may set East Asian text in this face; that has never
   been observed, only declared.
 
-Neither blocks 1.0.0. The condition set in the CHANGELOG was TUI rendering
+It does not block 1.0.0. The condition set in the CHANGELOG was TUI rendering
 without column shear, including the Braille spinner and the box-drawn frames,
 and that is exactly what these captures show.
+
+## conhost, and the one thing it does differently
+
+Getting conhost to display the sample at all took `chcp 65001`: it decodes
+output with the system ANSI code page, 949 on a Korean install, and this sample
+is UTF-8. Worth recording because a mojibaked font sample looks like a font
+defect and is not one — the sample now says so in its own header, since telling
+a reader to run a file that garbles on the platform's default console is an
+instruction that fails in a way that blames the font.
+
+Once readable, conhost matches Windows Terminal on everything except one thing:
+**it widens NFD hangul.**
+
+| | columns for `NFC  한글 파일 이름 테스트` |
+|---|---|
+| Windows Terminal | 26, NFC and NFD pixel-identical |
+| conhost | 26 for NFC, **~39 for NFD** |
+
+The syllables still *compose* — they are drawn correctly, each followed by blank
+cells — so this is column accounting, not shaping. And it is not ours to fix.
+This font declares the conjoining jamo at 2 cells for the initial and **0 for
+medials and finals**, which is exactly what the `unicode11` provider says and
+what the gate asserts; Windows Terminal reads the same font and gets 26. conhost
+uses its own older width data and gives every jamo a cell. Setting those
+advances to anything else to satisfy it would shear the renderers that are
+right.
+
+Practical effect: an `ls` of NFD Korean filenames misaligns in conhost and not
+in Windows Terminal. Recorded rather than worked around.
 
 ## What the run caught
 
@@ -121,7 +161,14 @@ than an absent check because it reports success.**
 ## Downstream
 
 The trigger to reopen this is a new rendering path rather than a new version:
-Windows Terminal changing its text renderer, or a report of shear from conhost,
-WSL under a different terminal, or a DPI setting not covered here. A capture at
-100% scale and 11 px or smaller would close the hinting question that this one
-leaves open, and is worth taking if anyone runs the font at that size.
+Windows Terminal changing its text renderer, WSL under a terminal not covered
+here, or a report of shear from either console at a size neither round used.
+
+One experiment is now cheap and was never run: `postbuild.py --suffix " H"`
+exists so a hinted and an unhinted cut can be installed side by side and
+switched in a terminal config, and 14 px on ClearType is the only place the
+answer differs. It would settle whether ttfautohint's CJK stem snapping helps
+here or merely runs — [0010](0010-ttfautohint-hints-y-only.md) records that it
+reaches y only, so it may be doing less than its cost suggests. Not needed for
+1.0.0: what ships renders correctly, and this asks whether it could render
+better.

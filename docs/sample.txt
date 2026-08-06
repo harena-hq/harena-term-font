@@ -80,6 +80,10 @@ other characters.
 7. NFD HANGUL — macOS filenames arrive decomposed
    Both lines must look identical. If the second shows stacked or overlapping
    jamo, the font is not composing and the shaper is not covering for it.
+   Windows Console Host is the known exception: it composes them correctly
+   but gives each jamo its own cell, so the second line runs wider. That is
+   conhost's width table, not this font's — Windows Terminal, same font,
+   renders the two lines pixel for pixel alike.
 
 NFC  한글 파일 이름 테스트
 NFD  한글 파일 이름 테스트

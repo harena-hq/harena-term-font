@@ -23,11 +23,13 @@ now closed**, in the tree above this release:
    — fixed, which is exactly the CJK-wide outline change 0.x permits in a minor
    bump and 1.x would not.
 3. **Windows verified** — TUI rendering with no column shear, including the
-   Braille spinner and box-drawn frames. Run, measured off the captures, and
-   recorded in [ADR 0017](docs/adr/0017-windows-verified.md) along with what it
-   does *not* settle: the Remote Desktop session ignored its own 100% scale
-   setting and rendered at 200%, putting the em at 29.5 px where
-   ttfautohint's grid-fitting earns its keep below about 16.
+   Braille spinner and box-drawn frames, in **both** Windows Terminal and
+   Windows Console Host, at an em of 14 px where ttfautohint's grid-fitting
+   actually arbitrates. Measured off the captures rather than eyeballed, and
+   recorded in [ADR 0017](docs/adr/0017-windows-verified.md) with the one
+   platform difference it turned up: conhost gives every conjoining jamo a
+   cell, so NFD Korean runs wider there. The font declares them 2/0/0, which
+   is what the width provider says and what Windows Terminal renders.
 
 On the first of those: tagging v0.9.0 built the fonts on a clean runner from the
 pinned sources, ran the gate, reproduced every hash in `SHA256SUMS` and
@@ -55,6 +57,11 @@ making the claim.
 
 ### Fixed
 
+- **`docs/sample.txt` did not say how to read it on Windows.** Console Host
+  decodes with the system ANSI code page — 949 on a Korean install — so `type`
+  mojibakes a UTF-8 file there, and garbled Korean in a font sample reads as
+  the font failing. The header now gives the `chcp` and `OutputEncoding` forms
+  and says which symptom is which: mojibake is encoding, boxes are coverage.
 - **`docs/sample.txt` block 8 tested nothing.** It was titled "NERD FONT ICONS
   — Powerline and the icon sets" and contained four ordinary Unicode symbols
   and not one of the font's 3518 private-use glyphs, so on screen it read as
