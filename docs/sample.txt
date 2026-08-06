@@ -1,6 +1,17 @@
 Harena Term — terminal sample.  `cat docs/sample.txt`
 Each block says what to look at. Set your terminal to this font first.
 
+This file is UTF-8. Windows Console Host decodes output with the system ANSI
+code page — 949 on a Korean install — so `type` mojibakes it there. Windows
+Terminal is already UTF-8; conhost needs to be told:
+
+    cmd         chcp 65001  &&  type sample.txt
+    PowerShell  [Console]::OutputEncoding = [Text.Encoding]::UTF8
+                Get-Content -Encoding utf8 sample.txt
+
+Garbled Korean is that, not the font. Missing glyphs draw as boxes, not as
+other characters.
+
 ────────────────────────────────────────────────────────────────────────────────
 1. HANGUL SPACING — the reason this font exists
    Compare against your previous font at the same size. The gaps between

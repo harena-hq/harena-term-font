@@ -90,7 +90,13 @@ Two smaller gaps, recorded rather than waved past:
 
 - **conhost (GDI) was not run.** ttfautohint's default `-a qsq` gives GDI the
   strong mode and DirectWrite the quantized one, so they are deliberately not
-  the same rendering. Only the second was seen.
+  the same rendering. Only the second was seen. The first attempt mojibaked,
+  which is worth recording because it looks like a font defect and is not one:
+  conhost decodes output with the system ANSI code page — 949 on a Korean
+  install — and this sample is UTF-8. `chcp 65001` first. The sample now says
+  so in its own header. Telling a reader to run a file that garbles on the
+  platform's default console is an instruction that fails in a way that blames
+  the font.
 - **Word was not run.** The `OS/2` codepage bits are asserted by the gate and
   their point is that Word may set East Asian text in this face; that has never
   been observed, only declared.
