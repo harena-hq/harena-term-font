@@ -28,13 +28,13 @@ covers at full width.
 
 Grab the latest release from [**Releases**](../../releases/latest).
 
-> **This is 0.x, and the version number is deliberate.** The font is complete,
-> gated, and byte-reproducible on a clean CI runner. The weighting defect that
-> 0.9.0 shipped with is fixed in this tree — see
-> [ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md),
-> and note that the gate had been asserting the defect rather than missing it.
-> One thing is still unchecked: **Windows**, on a font whose whole subject is
-> terminals. See [why 0.x](CHANGELOG.md#why-0x).
+> **The published release is 0.9.0; this tree is ahead of it.** Two things
+> changed. The weighting defect 0.9.0 shipped with is fixed — the gate had been
+> asserting it rather than missing it
+> ([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md))
+> — and the font has now been run on **Windows**, which it never had been
+> ([ADR 0017](docs/adr/0017-windows-verified.md)). Those were the last two
+> conditions on 1.0.0. See [why 0.x](CHANGELOG.md#why-0x).
 
 | | |
 |---|---|

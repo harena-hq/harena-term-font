@@ -75,9 +75,15 @@ NFD  한글 파일 이름 테스트
 
 ────────────────────────────────────────────────────────────────────────────────
 8. NERD FONT ICONS — Powerline and the icon sets
+   A Powerline prompt is separators butted against their neighbour:
+   no seam where two meet, no gap where the colour changes. Every
+   glyph in this block is one column wide.
 
+    harena-term   main   clean   12:34 
+    right-to-left separators  for a right-aligned segment
 
-     0.9.0        main ✔    ⚡ ⚪ ⚫
+    python    rust    git    github    cog    save    files
+    terminal    branch    home    fail   ⚡ ⚪ ⚫   ✔ check
 
 ────────────────────────────────────────────────────────────────────────────────
 9. WEIGHT — Regular against Bold

@@ -45,6 +45,7 @@ alternatives that lost and why, and the mistakes that produced a rule.
 | | |
 |---|---|
 | [0016](0016-no-install-scripts.md) | **No install scripts.** One of the four reference repositories ships them; the two with the widest reach use package managers instead. The OS already installs a font, a package manager also handles upgrade and uninstall, and the download path coupled the project to its own URL shape — which failed silently, returning 404, for as long as the repository was private. The Windows script was shipped having never been executed. |
+| [0017](0017-windows-verified.md) | **Windows verified**, closing the last 1.0.0 condition. The 48-column frame's right edge lands on the same x for all eight rows — zero shear under DirectWrite — ambiguous width agrees with the terminal's default, NFD composes, box joins close, and Bold shares Regular's advances. Not settled: the captures were taken at ~22 px per em, and ttfautohint earns its keep below 16; conhost and Word were not run. |
 | [0015](0015-ttf-and-woff2-only.md) | TTF and WOFF2 only. OTF is declined structurally — CFF discards the ttfautohint work on all 36859 hinted glyphs, curve conversion moves points the cell measurements have no room for, and the 158 checks read `glyf`. TTC is declined on arithmetic: a collection shares byte-identical **tables**, not glyphs, and 611 differing glyphs keep all 17.66 MB of `glyf` duplicated — **0.6% saved**. |
 
 ## Identity
@@ -85,3 +86,8 @@ are to remember.
   ranges the authority never listed. 0014 is the opposite: listed, measured, and
   asserted — at a value that erases a deliberate design decision. Passing at
   `1.000×` reads as precision; it is the defect written down as a requirement.
+- **A check whose title claims more than its body tests.** Worse than an
+  absent check, because it reports success. `docs/sample.txt` block 8 was
+  titled "Nerd Font icons" and contained none of the font's 3518 private-use
+  glyphs (0017); the letterspacing gate asserted a one-sided bound under a
+  label announcing a two-sided band (0014).

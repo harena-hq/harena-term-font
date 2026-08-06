@@ -26,13 +26,13 @@ Harena Term은 각 문자 체계를 **고유 폭이 셀에 정확히 떨어지�
 
 [**Releases**](../../releases/latest)에서 최신 배포본을 받으세요.
 
-> **0.x이고, 이 번호는 의도한 것입니다.** 글꼴 자체는 완성돼 있고 게이트를
-> 통과하며, 클린 CI 러너에서 바이트 단위로 재현됩니다. 0.9.0이 안고 나갔던 획
-> 굵기 결함은 이 트리에서 고쳐졌습니다 —
-> [ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md),
-> 게이트가 그 결함을 놓친 게 아니라 **단언하고 있었다**는 점까지 함께.
-> 남은 미확인은 하나, **Windows**입니다. 터미널을 주제로 하는 글꼴인데도요.
-> [왜 0.x인지](CHANGELOG.md#why-0x).
+> **공개된 배포본은 0.9.0이고, 이 트리는 그보다 앞서 있습니다.** 두 가지가
+> 바뀌었습니다. 0.9.0이 안고 나갔던 획 굵기 결함이 고쳐졌고 — 게이트가 그 결함을
+> 놓친 게 아니라 **단언하고 있었습니다**
+> ([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md))
+> — 한 번도 없었던 **Windows** 실행이 이루어졌습니다
+> ([ADR 0017](docs/adr/0017-windows-verified.md)). 1.0.0의 남은 두 조건이
+> 이것이었습니다. [왜 0.x인지](CHANGELOG.md#why-0x).
 
 | | |
 |---|---|

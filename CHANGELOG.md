@@ -15,16 +15,18 @@ and this file cannot disagree.
 
 ### Why 0.x
 
-The font is complete, gated and reproducible, and it is still below 1.0 on
-purpose. **1.0.0 now waits on one thing**, recorded rather than vague:
+v0.9.0 shipped below 1.0 on purpose, waiting on three things. **All three are
+now closed**, in the tree above this release:
 
-1. **Windows verified** — TUI rendering with no column shear, including the
-   Braille spinner and box-drawn frames. Never run, and this is a terminal font.
-
-The other condition,
-[ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md),
-is closed: fixed in the tree above this release, which is exactly the CJK-wide
-outline change 0.x permits in a minor bump and 1.x would not.
+1. **The release workflow exercised for real** — met by tagging v0.9.0 itself.
+2. **[ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)**
+   — fixed, which is exactly the CJK-wide outline change 0.x permits in a minor
+   bump and 1.x would not.
+3. **Windows verified** — TUI rendering with no column shear, including the
+   Braille spinner and box-drawn frames. Run, measured off the captures, and
+   recorded in [ADR 0017](docs/adr/0017-windows-verified.md) along with what it
+   does *not* settle: the captures were taken at roughly 22 px per em, and
+   ttfautohint's grid-fitting earns its keep below about 16.
 
 A third condition is now met: the release workflow has been exercised for real.
 Tagging v0.9.0 built the fonts on a clean runner from the pinned sources, ran
@@ -56,6 +58,12 @@ claiming something nobody has checked.
 
 ### Fixed
 
+- **`docs/sample.txt` block 8 tested nothing.** It was titled "NERD FONT ICONS
+  — Powerline and the icon sets" and contained four ordinary Unicode symbols
+  and not one of the font's 3518 private-use glyphs, so on screen it read as
+  though the font had no icons. It now uses real Powerline separators and icon
+  glyphs, every one width-checked against the shipped `hmtx`. Found by running
+  the sample on Windows — see [ADR 0017](docs/adr/0017-windows-verified.md).
 - **The gate was asserting the defect above, not missing it.** It required
   `hangul stroke == han stroke` and passed at 1.000×. It now asserts the
   source's own ratio per weight, and on **both** axes: the two point opposite

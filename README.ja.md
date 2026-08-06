@@ -28,13 +28,13 @@ Harena Term は各文字体系を、**その固有アドバンスがセルにち
 
 最新版は [**Releases**](../../releases/latest) から。
 
-> **0.x であり、この番号は意図的です。** フォント自体は完成しており、ゲートを
-> 通過し、クリーンな CI ランナー上でバイト単位に再現されます。0.9.0 が抱えて
-> いた字画の太さの欠陥は、このツリーで修正済みです —
-> [ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)。
-> ゲートはそれを見落としていたのではなく、**断言していました**。未確認のまま
-> 残っているのは一つ、**Windows** です。ターミナルを主題とするフォントであるに
-> もかかわらず。[なぜ 0.x なのか](CHANGELOG.md#why-0x)。
+> **公開されている版は 0.9.0 で、このツリーはそれより先に進んでいます。** 二点
+> 変わりました。0.9.0 が抱えていた字画の太さの欠陥が修正され — ゲートはそれを
+> 見落としていたのではなく、**断言していました**
+> ([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md))
+> — そして一度も行われていなかった **Windows** での実行が行われました
+> ([ADR 0017](docs/adr/0017-windows-verified.md))。1.0.0 に残っていた二つの条件が
+> これでした。[なぜ 0.x なのか](CHANGELOG.md#why-0x)。
 
 | | |
 |---|---|
