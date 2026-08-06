@@ -27,11 +27,10 @@ Harena Term은 각 문자 체계를 **고유 폭이 셀에 정확히 떨어지�
 [**Releases**](../../releases/latest)에서 최신 배포본을 받으세요.
 
 > **0.9.0이고, 이 번호는 의도한 것입니다.** 글꼴 자체는 완성돼 있고 게이트를
-> 통과하며 재현 가능합니다. 다만 세 가지가 아직 확인되지 않았습니다 — 측정된
-> 획 굵기 결함 하나([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)),
-> Windows, 그리고 릴리스 파이프라인 자체. [왜 0.x인지](CHANGELOG.md#why-0x).
-> 글자 위치가 움직일 일은 없습니다 — 폭과 메트릭은 게이트가 단언합니다 — 그러나
-> CJK 획 굵기는 1.0 전에 바뀝니다.
+> 통과하며, 클린 CI 러너에서 바이트 단위로 재현됩니다. 다만 두 가지가 아직
+> 확인되지 않았습니다 — 측정된 획 굵기 결함 하나([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md))와
+> Windows. [왜 0.x인지](CHANGELOG.md#why-0x). 글자 위치가 움직일 일은 없습니다 —
+> 폭과 메트릭은 게이트가 단언합니다 — 그러나 CJK 획 굵기는 1.0 전에 바뀝니다.
 
 | | |
 |---|---|
@@ -43,21 +42,20 @@ Regular, Bold.
 
 ## 설치
 
+압축을 풀고 시스템 글꼴 설치기를 쓰세요 — macOS는 Font Book, Windows는 파일을
+선택해 우클릭 → 설치. 또는 시스템이 찾는 자리에 넣으면 됩니다:
+
 ```sh
-# macOS, Linux — 최신 배포본을 받아 설치합니다
-./install/install-unix.sh
+# macOS
+cp *.ttf ~/Library/Fonts/
 
-./install/install-unix.sh --version v0.9.0   # 특정 버전
-./install/install-unix.sh --from dist        # 직접 빌드한 것
+# Linux
+cp *.ttf ~/.local/share/fonts/ && fc-cache -f
 ```
 
-```powershell
-# Windows, 관리자 권한 프롬프트에서
-.\install\install-windows.ps1
-.\install\install-windows.ps1 -From dist
-```
-
-압축을 풀어 시스템 글꼴 설치기를 써도 됩니다. 스크립트는 클릭을 줄여줄 뿐입니다.
+이 프로젝트는 설치 스크립트를 배포하지 않습니다. OS가 이미 잘 하는 일이고, 그
+너머는 우리가 유지보수하고도 모든 플랫폼에서 시험할 수 없는 스크립트보다 패키지
+매니저가 낫기 때문입니다 — [ADR 0016](docs/adr/0016-no-install-scripts.md).
 
 ## 두 벌: K와 J
 

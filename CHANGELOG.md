@@ -16,22 +16,34 @@ and this file cannot disagree.
 ### Why 0.x
 
 The font is complete, gated and reproducible, and it is still below 1.0 on
-purpose. **1.0.0 waits on three things**, all of them recorded rather than
-vague:
+purpose. **1.0.0 waits on two things**, both recorded rather than vague:
 
 1. **[ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)
    resolved** — fixed, or accepted with a written rationale. Fixing it changes
    every CJK outline, which 0.x permits in a minor bump and 1.x would not.
-2. **Windows verified** — TUI rendering and the installer. Neither has been
-   run, and this is a terminal font.
-3. **The release workflow exercised for real, at least once.**
+2. **Windows verified** — TUI rendering with no column shear, including the
+   Braille spinner and box-drawn frames. Never run, and this is a terminal font.
 
-Until then a version number that claims stability would be claiming something
-nobody has checked.
+A third condition is now met: the release workflow has been exercised for real.
+Tagging v0.9.0 built the fonts on a clean runner from the pinned sources, ran
+the gate at 154/154, reproduced every hash in `SHA256SUMS`, and published — in
+17m45s. That is also what turned "byte-reproducible" from a claim into a
+checked fact, since until then it had only ever been verified on the machine
+that made the claim.
+
+Until the two above are closed, a version number that claims stability would be
+claiming something nobody has checked.
 
 ## [Unreleased]
 
-Nothing yet.
+### Removed
+
+- **The install scripts.** Unzipping and using the system font installer is one
+  step, and beyond that a package manager handles upgrade and uninstall too —
+  neither of which these attempted. The download path hardcoded a release URL,
+  which returned 404 for as long as this repository was private with nothing
+  able to notice, and the Windows script was published having never been
+  executed. See [ADR 0016](docs/adr/0016-no-install-scripts.md).
 
 ## [0.9.0] — 2026-08-05
 

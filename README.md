@@ -29,12 +29,12 @@ covers at full width.
 Grab the latest release from [**Releases**](../../releases/latest).
 
 > **This is 0.9.0, and the version number is deliberate.** The font is complete,
-> gated and reproducible, and three things are still unchecked: one measured
-> weighting defect ([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)),
-> Windows, and the release pipeline itself. See
-> [why 0.x](CHANGELOG.md#why-0x). Nothing here is expected to move your text —
-> advances and metrics are asserted by the gate — but the CJK stroke weights
-> will change before 1.0.
+> gated, and byte-reproducible on a clean CI runner. Two things are still
+> unchecked: one measured weighting defect
+> ([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md))
+> and Windows. See [why 0.x](CHANGELOG.md#why-0x). Nothing here is expected to
+> move your text — advances and metrics are asserted by the gate — but the CJK
+> stroke weights will change before 1.0.
 
 | | |
 |---|---|
@@ -45,22 +45,20 @@ Each holds four faces: `Harena Term K` and `Harena Term J`, Regular and Bold.
 
 ## Install
 
+Unzip and use your system's font installer — Font Book on macOS, select the
+files and right-click → Install on Windows. Or put them where the system looks:
+
 ```sh
-# macOS and Linux — downloads the latest release and installs it
-./install/install-unix.sh
+# macOS
+cp *.ttf ~/Library/Fonts/
 
-./install/install-unix.sh --version v0.9.0   # a specific release
-./install/install-unix.sh --from dist        # fonts you built yourself
+# Linux
+cp *.ttf ~/.local/share/fonts/ && fc-cache -f
 ```
 
-```powershell
-# Windows, from an elevated prompt
-.\install\install-windows.ps1
-.\install\install-windows.ps1 -From dist
-```
-
-Or unzip the release and use the system font installer — these scripts only save
-you the clicking.
+This project ships no install script. The OS already does this well, and for
+the rest a package manager beats a script we would have to maintain and could
+not test on every platform — see [ADR 0016](docs/adr/0016-no-install-scripts.md).
 
 ## The two cuts: K and J
 

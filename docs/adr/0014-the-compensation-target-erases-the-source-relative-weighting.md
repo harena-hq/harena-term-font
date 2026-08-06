@@ -4,8 +4,9 @@ Status: **open**. Measured, reproduced, and deliberately not acted on in v0.9.0 
 the change lands on top of a released baseline rather than inside the first
 release, for the reason given at the end.
 
-**This is one of the three things 1.0.0 is waiting on.** The others are Windows
-verification and one real run of the release workflow.
+**This is one of the two things 1.0.0 is waiting on.** The other is Windows
+verification; the third condition, a real run of the release workflow, was met
+by v0.9.0.
 
 Reproduce with `python3 scripts/probe_script_weight.py`, from a tree where
 `fetch_sources.sh` has run and `dist/` is built.
