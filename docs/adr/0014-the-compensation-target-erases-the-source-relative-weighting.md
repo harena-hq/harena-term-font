@@ -110,6 +110,49 @@ is Pretendard's drawing, carried through unchanged. Vertical ink extents match
 the source to a few units per mille as well. **What changed is weight alone**,
 and a glyph of the same size with heavier strokes reads larger.
 
+### Faithful to the source, and the source is an outlier
+
+"Same as our source" answers whether the transform distorted anything. It does
+not answer whether the shape is ordinary, which is the next question anyone
+asks. Widening the comparison, on the katakana sample and `w/h`, a unit-free
+ratio that survives differing upm and advances:
+
+| | katakana w/h | ink width / advance | `ト` w/h |
+|---|---|---|---|
+| ours | **1.059** | 0.837 | 0.805 |
+| Pretendard JP | **1.059** | 0.830 | 0.795 |
+| M PLUS 1p | 1.029 | 0.785 | 0.785 |
+| Noto Sans KR | 1.016 | 0.771 | **0.644** |
+| Sarasa Term J / K | 1.016 | 0.771 | **0.644** |
+
+Ours reproduces Pretendard to three decimals, and **Pretendard is the widest of
+the five**. Its kana came from M PLUS 1p, which is already wider than the
+Noto/Sarasa line, and Pretendard widened it a further 3%. `ト` is the extreme
+case: 0.795 against 0.644, a 23% difference in one of the six glyphs that made
+this look wrong in the first place.
+
+A third component is not weight or shape at all, but the flagship decision:
+
+| ink height / advance | hangul | katakana | katakana / hangul |
+|---|---|---|---|
+| ours | **0.932** | 0.794 | **0.852** |
+| Pretendard JP | 0.931 | 0.788 | 0.847 |
+| Sarasa Term K | 0.839 | 0.767 | **0.914** |
+
+Sarasa sets hangul small in the cell, so its kana sits close to it. This build
+fills the cell with hangul, which is the point of
+[0002](0002-advance-normalisation-is-an-identity.md) — and the same faithfully
+sized kana therefore reads **7% smaller beside it**. That ratio matches
+Pretendard's own to 0.6%, so it is the source's proportion, not a defect. It is
+simply not the proportion a reader arrives from Sarasa expecting.
+
+So three things make `セットアップ` look wrong, and only the first is ours:
+stroke weight (this record), Pretendard's unusually wide kana (the source's
+drawing), and a smaller kana-to-hangul ratio (0002 working as designed). The
+change specified below fixes the first alone. The second and third would mean
+redrawing or non-uniformly scaling the kana, which trades away 0002's identity —
+a different decision, on a defect nobody has yet shown to exist.
+
 ## Severity
 
 The tempting way to rate this low is [0006](0006-two-regional-cuts-with-ss05-baked-in.md)'s
