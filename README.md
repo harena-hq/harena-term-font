@@ -28,13 +28,13 @@ covers at full width.
 
 Grab the latest release from [**Releases**](../../releases/latest).
 
-> **The published release is 0.9.0; this tree is ahead of it.** Two things
-> changed. The weighting defect 0.9.0 shipped with is fixed — the gate had been
-> asserting it rather than missing it
-> ([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md))
-> — and the font has now been run on **Windows**, which it never had been
-> ([ADR 0017](docs/adr/0017-windows-verified.md)). Those were the last two
-> conditions on 1.0.0. See [why 0.x](CHANGELOG.md#why-0x).
+> **1.0.0.** The three conditions this project set for a stable number are met:
+> a release workflow proven by a real release, the weighting defect 0.9.0
+> shipped with [fixed](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md),
+> and Windows [run and measured](docs/adr/0017-windows-verified.md) rather than
+> assumed. What the number does not mean is that nothing is left — the
+> [known limitations](CHANGELOG.md#known) are listed, and each is a decision
+> with a record behind it. See [the road to 1.0](CHANGELOG.md#the-road-to-10).
 
 | | |
 |---|---|

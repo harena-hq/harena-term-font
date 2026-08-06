@@ -13,10 +13,10 @@ The tag and the font's internal version are kept equal — `head.fontRevision`
 and `nameID 5` read the same number a release is tagged with, so a font manager
 and this file cannot disagree.
 
-### Why 0.x
+### The road to 1.0
 
 v0.9.0 shipped below 1.0 on purpose, waiting on three things. **All three are
-now closed**, in the tree above this release:
+closed**, and 1.0.0 is what closing them produced:
 
 1. **The release workflow exercised for real** — met by tagging v0.9.0 itself.
 2. **[ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)**
@@ -38,6 +38,8 @@ a checked fact, since until then it had only ever been verified on the machine
 making the claim.
 
 ## [Unreleased]
+
+## [1.0.0] — 2026-08-06
 
 ### Changed
 
@@ -86,6 +88,28 @@ making the claim.
   which returned 404 for as long as this repository was private with nothing
   able to notice, and the Windows script was published having never been
   executed. See [ADR 0016](docs/adr/0016-no-install-scripts.md).
+
+### Known
+
+Each of these is a decision with a record behind it rather than an oversight.
+
+- Ambiguous-width characters resolve to **one** cell. A terminal configured
+  `ambiguous = wide` will shear those rows. A font has one advance per glyph
+  and cannot serve both readings.
+- **Windows Console Host widens NFD hangul**, giving every conjoining jamo a
+  cell where the width provider says 2/0/0. Windows Terminal, same font, renders
+  NFC and NFD identically. Changing the advances to suit conhost would shear
+  every renderer that is right. See
+  [ADR 0017](docs/adr/0017-windows-verified.md).
+- `☎ ☏ ♨` are not shipped. They are one cell here, every source draws them
+  full-width, and halving a full-width design halves its stroke past what the
+  `wght` axis can restore. This is the only gap in cp949.
+- Hinting reaches y only, so vertical strokes gain nothing from it. Under
+  grayscale antialiasing that is visible; under subpixel rendering it is not.
+  See [ADR 0010](docs/adr/0010-ttfautohint-hints-y-only.md).
+- The `OS/2` codepage bits declare this face eligible for East Asian text in
+  Windows applications. That is asserted by the gate and has never been
+  **observed** — Word has not been run.
 
 ## [0.9.0] — 2026-08-05
 
@@ -140,5 +164,6 @@ and Bold, at 38478 glyphs and 37652 codepoints each.
   See [ADR 0010](docs/adr/0010-ttfautohint-hints-y-only.md).
 - TUI rendering is verified on macOS. **Not verified on Windows.**
 
-[Unreleased]: ../../compare/v0.9.0...HEAD
+[Unreleased]: ../../compare/v1.0.0...HEAD
+[1.0.0]: ../../releases/tag/v1.0.0
 [0.9.0]: ../../releases/tag/v0.9.0

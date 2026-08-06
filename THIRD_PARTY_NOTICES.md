@@ -183,18 +183,18 @@ python3 scripts/verify.py          # conformance gate; exit 0 == sealable
 ## Outputs
 
 
-- `HarenaTermJ-Bold.ttf` — 18.86 MB — `8a02aeb96e055e2afcef3136c2523c828b4c0a828d2e886be42811ded186bc55`
-- `HarenaTermJ-Bold.woff2` — 4.96 MB — `370b10ebc107582b51c9ef22ce19670bc680e1fb07a54c11fa7a989a81ba63ae`
-- `HarenaTermJ-Regular.ttf` — 18.21 MB — `8428b5622120becf812d91502fb3578737225fdec1bad62063528b19350cc910`
-- `HarenaTermJ-Regular.woff2` — 4.84 MB — `dc05a8191d39275a9f450b1d49758f579d3d74eec4619cfb79f0156f45e3cb1b`
-- `HarenaTermK-Bold.ttf` — 18.87 MB — `eb568ac8b7216d0258da7e129a017e906cfa1a338a771846ea01fe662d77d3d8`
-- `HarenaTermK-Bold.woff2` — 4.96 MB — `61fad58cd72328f5305a43837df6508c4978eee45d2a2aa0b122f0829311b635`
-- `HarenaTermK-Regular.ttf` — 18.23 MB — `2a6b5bfacf42ee1bed53dd519649a8918c5b8cd2d8de1ed37798bea11b815f3d`
-- `HarenaTermK-Regular.woff2` — 4.84 MB — `f012c56080e77e7cfb4feea21ef94d6e2cb631b179fe0c14530639da238467a7`
+- `HarenaTermJ-Bold.ttf` — 18.86 MB — `427c3d4cb712f11b1de6f798c6baff674938de0302b0cff3b8c88394b4e4c5ba`
+- `HarenaTermJ-Bold.woff2` — 4.96 MB — `a2e8f4353fe083693da81c6fe6db8e77474c0166a2749401d40675347d5cba64`
+- `HarenaTermJ-Regular.ttf` — 18.21 MB — `d10ff6ad53d9612021fa45c5e4504fc12687be17b37df378899fa3ef400cbc24`
+- `HarenaTermJ-Regular.woff2` — 4.84 MB — `5f619e01b05c436807805629079817e9400b946b8a6005b06dc57f66f70f85a1`
+- `HarenaTermK-Bold.ttf` — 18.87 MB — `43ee5ca6b5fb54a747c9581ce6590c9e307c25e81ddac159979a505432e8a6d8`
+- `HarenaTermK-Bold.woff2` — 4.96 MB — `d5e2cf142c6640bc70af7f7180398c96c3a4fa27d1892f6e2e3713468eb580f5`
+- `HarenaTermK-Regular.ttf` — 18.23 MB — `7b10294c1c8461c236a702774d8996906e22ce3612a330996d5746e3feeafc99`
+- `HarenaTermK-Regular.woff2` — 4.84 MB — `bf8c29058928122e16dfe3bbfbed6ed0fbe207a18faf8e40a9479a1eac7eab79`
 
 ## Base binaries consumed
 
 - `sources/iosevka-src/dist/HarenaLatin/TTF/HarenaLatin-Regular.ttf` — `de003bd5ec2b99c54b45657ad4642dafcbf2d7fa39f3858e7fbb39b3c9158f38`
 - `sources/iosevka-src/dist/HarenaLatin/TTF/HarenaLatin-Bold.ttf` — `456f969dc7af4bd91f188df7d7a754e4a8de06e37bc593606ed0f197f077c138`
 
-Built from commit `adab86f`.
+Built from commit `adc71b8`.

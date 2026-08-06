@@ -28,13 +28,13 @@ Harena Term は各文字体系を、**その固有アドバンスがセルにち
 
 最新版は [**Releases**](../../releases/latest) から。
 
-> **公開されている版は 0.9.0 で、このツリーはそれより先に進んでいます。** 二点
-> 変わりました。0.9.0 が抱えていた字画の太さの欠陥が修正され — ゲートはそれを
-> 見落としていたのではなく、**断言していました**
-> ([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md))
-> — そして一度も行われていなかった **Windows** での実行が行われました
-> ([ADR 0017](docs/adr/0017-windows-verified.md))。1.0.0 に残っていた二つの条件が
-> これでした。[なぜ 0.x なのか](CHANGELOG.md#why-0x)。
+> **1.0.0。** 安定版の番号に課していた三つの条件がすべて満たされました。実際の
+> リリースで検証されたリリースワークフロー、0.9.0 が抱えていた字画の太さの欠陥の
+> [修正](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md)、
+> そして仮定ではなく[実行して測定した](docs/adr/0017-windows-verified.md) Windows。
+> この番号が意味し**ない**のは、もう何も残っていないということです —
+> [既知の制限](CHANGELOG.md#known)は一覧にしてあり、そのどれもが見落としではなく
+> 記録を伴う決定です。[1.0 までの道のり](CHANGELOG.md#the-road-to-10)。
 
 | | |
 |---|---|

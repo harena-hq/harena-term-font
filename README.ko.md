@@ -26,13 +26,13 @@ Harena Term은 각 문자 체계를 **고유 폭이 셀에 정확히 떨어지�
 
 [**Releases**](../../releases/latest)에서 최신 배포본을 받으세요.
 
-> **공개된 배포본은 0.9.0이고, 이 트리는 그보다 앞서 있습니다.** 두 가지가
-> 바뀌었습니다. 0.9.0이 안고 나갔던 획 굵기 결함이 고쳐졌고 — 게이트가 그 결함을
-> 놓친 게 아니라 **단언하고 있었습니다**
-> ([ADR 0014](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md))
-> — 한 번도 없었던 **Windows** 실행이 이루어졌습니다
-> ([ADR 0017](docs/adr/0017-windows-verified.md)). 1.0.0의 남은 두 조건이
-> 이것이었습니다. [왜 0.x인지](CHANGELOG.md#why-0x).
+> **1.0.0.** 안정 버전 번호에 걸어둔 세 조건이 모두 충족되었습니다: 실제 배포로
+> 검증된 릴리스 워크플로, 0.9.0이 안고 나갔던 획 굵기 결함의
+> [해결](docs/adr/0014-the-compensation-target-erases-the-source-relative-weighting.md),
+> 그리고 가정이 아니라 [실행하고 측정한](docs/adr/0017-windows-verified.md) Windows.
+> 이 번호가 뜻하지 *않는* 것은 남은 게 없다는 뜻입니다 —
+> [알려진 한계](CHANGELOG.md#known)는 목록으로 있고, 각각은 실수가 아니라 기록을
+> 가진 결정입니다. [1.0까지의 길](CHANGELOG.md#the-road-to-10).
 
 | | |
 |---|---|
