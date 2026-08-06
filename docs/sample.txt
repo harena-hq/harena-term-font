@@ -1,0 +1,85 @@
+Harena Term — terminal sample.  `cat docs/sample.txt`
+Each block says what to look at. Set your terminal to this font first.
+
+────────────────────────────────────────────────────────────────────────────────
+1. HANGUL SPACING — the reason this font exists
+   Compare against your previous font at the same size. The gaps between
+   syllables should be noticeably tighter, and the syllables noticeably larger
+   in the cell. Nothing should touch.
+
+한글 자간은 원본 글꼴의 것을 그대로 가져옵니다
+서울 부산 대구 인천 광주 대전 울산 세종 제주
+빨간 우체통 앞에서 왼쪽으로 꺾어 쭉 걸으면 됩니다
+뚫훓쫓빻꿇렬끓쏟짧웅쌍핥읊꽃잎쐐횃뷁훽쒫뾹      ← densest syllables; check for collisions
+
+────────────────────────────────────────────────────────────────────────────────
+2. HANGUL BESIDE KANA — the known open defect (ADR 0014)
+   Hangul should not look lighter or smaller than the kana next to it.
+   If the kana reads heavier, that is the defect, not your eyes.
+
+설치 セットアップ 완료 しました 확인 かくにん
+로그인 ログイン 되었습니다 サーバー 응답 レスポンス
+가나다라마바사 アイウエオカキ あいうえおかき
+
+────────────────────────────────────────────────────────────────────────────────
+3. K vs J REGIONAL FORMS — 611 codepoints differ
+   Harena Term K keeps the radical's traditional two dots; J uses one.
+   Set K and J in turn and watch the lower left of each character.
+
+運 進 週 選 過 達 通 連 遠 道 近 返 退 追 迎 逆 造 速 適
+週末に運転して遠くの道を通り、近くの店に返品した。
+
+────────────────────────────────────────────────────────────────────────────────
+4. THE GRID — every CJK glyph must be exactly two columns
+   The right edge of the box must be straight. Any ragged line is column shear.
+
+┌──────────────────────────────────────────────┐
+│ 한글과 English 가 한 줄에                    │
+│ 日本語 と English が 一行に                  │
+│ const 결과 = await run('빌드');  // 주석     │
+│ 12:34:56  INFO  요청 처리됨  request handled │
+│ ｱｲｳｴｵ halfwidth  ＡＢＣ fullwidth  ￥ ￡ ￠  │
+└──────────────────────────────────────────────┘
+
+────────────────────────────────────────────────────────────────────────────────
+5. BOX DRAWING, BLOCKS, BRAILLE — TUI furniture
+   Box lines must join with no gaps. Blocks must tile with no seams.
+   Braille is what agent TUIs spin.
+
+╔══════════╦══════════╗   ┏━━━━━━━━━━┳━━━━━━━━━━┓   ╭──────────╮
+║ double   ║ frame    ║   ┃ heavy    ┃ frame    ┃   │ rounded  │
+╠══════════╬══════════╣   ┣━━━━━━━━━━╋━━━━━━━━━━┫   ╰──────────╯
+║ 한글 셀  ║ 日本語   ║   ┃ 한글 셀  ┃ 日本語   ┃
+╚══════════╩══════════╝   ┗━━━━━━━━━━┻━━━━━━━━━━┛
+
+▁▂▃▄▅▆▇█▇▆▅▄▃▂▁   ░▒▓█▓▒░   ██▛▜▙▟▚▞
+⣾⣽⣻⢿⡿⣟⣯⣷  ⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏  ⣿⣤⣀ 100%
+
+────────────────────────────────────────────────────────────────────────────────
+6. AMBIGUOUS WIDTH — one cell here, two in some terminals
+   These are drawn one column wide. If your terminal is set
+   `ambiguous = wide` it reserves two, and this row will shear.
+
+0123456789012345678901234567890123456789   ← ruler, 40 columns
+♥♦♣♠○●◎◇◆□■△▲▽▼→←↑↓±×÷≠≤≥∞′″§¶★☆♪♫†‡‰µΩ√    ← must also end at column 40
+
+────────────────────────────────────────────────────────────────────────────────
+7. NFD HANGUL — macOS filenames arrive decomposed
+   Both lines must look identical. If the second shows stacked or overlapping
+   jamo, the font is not composing and the shaper is not covering for it.
+
+NFC  한글 파일 이름 테스트
+NFD  한글 파일 이름 테스트
+
+────────────────────────────────────────────────────────────────────────────────
+8. NERD FONT ICONS — Powerline and the icon sets
+
+
+     0.9.0        main ✔    ⚡ ⚪ ⚫
+
+────────────────────────────────────────────────────────────────────────────────
+9. WEIGHT — Regular against Bold
+   Bold hangul should stay inside its cell. Nothing should touch its neighbour.
+
+Regular  한글 日本語 English 0123456789 뚫쫓빻꿇
+Bold     한글 日本語 English 0123456789 뚫쫓빻꿇   ← set this line bold in your terminal

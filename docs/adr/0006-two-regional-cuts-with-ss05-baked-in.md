@@ -5,9 +5,13 @@ Status: **permanent**.
 ## Context
 
 Korean and Japanese draw many of the same han differently. The most visible case
-is the 辵 radical — Korean keeps the traditional two-dot 辶, the Japanese
-shinjitai uses one — and it appears in everyday characters: 運 進 週 選 過 達 連
-遠 道 近 返 退 追 迎 逆 通 造 速 適.
+is the walking radical at the lower left of 運 進 週 選 過 達 連 遠 道 近 返 退 追
+迎 逆 通 造 速 適 — Korean keeps its traditional two dots, the Japanese shinjitai
+uses one.
+
+(The radical itself, U+8FB5 and U+8FB6, is deliberately not in this font: it is
+outside Pretendard JP's 7138 han, and a document that names it would render tofu
+in the very face it describes.)
 
 Pretendard JP carries the Korean forms properly, declaring a `hani` script with a
 `KOR ` language system and shipping them in both `locl` (540 substitutions, 534

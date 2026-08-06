@@ -135,9 +135,9 @@ will essentially never render. See [ADR 0005](docs/adr/0005-cjk-source-stays-pre
 
 ### D5 — Two regional cuts, with `ss05` baked into `cmap`
 
-Korean and Japanese draw many of the same han differently — most visibly the 辵
-radical, where Korean keeps the traditional two-dot 辶 and the Japanese shinjitai
-uses one, in everyday characters like 運 進 週 選 過 達 通 連 遠.
+Korean and Japanese draw many of the same han differently — most visibly the
+walking radical at the lower left of 運 進 週 選 過 達 通 連 遠, where Korean keeps
+its traditional two dots and the Japanese shinjitai uses one.
 
 Pretendard JP carries both, in `locl` and `ss05`. **A terminal cannot reach
 either at runtime**: texture-atlas renderers build `ctx.font` from a plain CSS

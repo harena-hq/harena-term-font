@@ -63,8 +63,8 @@ not test on every platform — see [ADR 0016](docs/adr/0016-no-install-scripts.m
 ## The two cuts: K and J
 
 Korean and Japanese draw many of the same han differently. The clearest case is
-the 辵 radical — Korean keeps the traditional two-dot 辶, the Japanese shinjitai
-uses one — and it appears in everyday characters: 運 進 週 選 過 達 通 連 遠.
+the walking radical at the lower left of 運 進 週 選 過 達 通 連 遠 — Korean keeps
+its traditional two dots, the Japanese shinjitai uses one.
 
 Unicode encodes these as the *same* codepoint, so the difference is a glyph
 choice, not an encoding one. It normally lives in an OpenType `locl` feature that
