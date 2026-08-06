@@ -9,29 +9,26 @@ is the walking radical at the lower left of 運 進 週 選 過 達 連 遠 道 
 迎 逆 通 造 速 適 — Korean keeps its traditional two dots, the Japanese shinjitai
 uses one.
 
-**The radical itself is not in this font**, and naming it in prose is therefore
-a trap: U+8FB5 and U+8FB6 fall outside Pretendard JP's 7138 han, so a document
-that spells them out renders in a fallback face — or as tofu where no CJK
-fallback exists — in the very font it is describing. Every document here
-describes the radical through characters the font draws.
+**The radical itself is not in this font**, and that makes naming it in prose a
+trap rather than a gap. U+8FB5 and U+8FB6 fall outside Pretendard JP's 7138 han,
+so a document that spells them out renders in a fallback face — or as tofu where
+no CJK fallback exists — in the very font it is describing. Every document here
+now describes the radical through characters the font draws.
 
-It could be added. Measured, **Noto Sans KR draws both at exactly 1.000 em**,
-which satisfies [0013](0013-the-width-table-must-cover-what-the-build-declares.md)'s
-own rule — a glyph is imported when some source draws it at full width — and
-Noto is already a graft source here rather than a fourth letterform system, with
-the transform against our han already solved.
-
-Not done, because two glyphs do not pay for a release: changing any outline
-invalidates all eight hashes in `SHA256SUMS` and needs a new tag.
-
-**Trigger:** fold it into the next release that changes outlines anyway. The one
-already specified is
-[0014](0014-the-compensation-target-erases-the-source-relative-weighting.md),
-which rewrites every CJK glyph.
+They are not otherwise special. **13854 of the block's 20992 han are absent**,
+and these two are ordinary members of that set: neither is in Shift_JIS,
+EUC-KR, cp932 or cp949, so neither belongs to any standard
+[0005](0005-cjk-source-stays-pretendard-jp.md) claims complete. 2072 of the
+absent han are available in Noto Sans KR, which is already a graft source — so
+"an existing source draws it at full width" is not a reason to import these two.
+That rule in [0013](0013-the-width-table-must-cover-what-the-build-declares.md)
+decides *which source* to take a glyph from once it is wanted; it does not decide
+that it is wanted. Grafting these two because we happened to type them would be
+arbitrary — 2 of 2072 equally available glyphs, chosen by accident of prose.
 
 Not to be confused with `☎ ☏ ♨`, which also appear in these documents and are
 also absent. Those are absent *on purpose* ([PLAN.md](../../PLAN.md) D8) and the
-documents name them in order to say so. A prose mention of a deliberately
+documents name them in order to record that. A prose mention of a deliberately
 excluded glyph is not a coverage gap.
 
 Pretendard JP carries the Korean forms properly, declaring a `hani` script with a
