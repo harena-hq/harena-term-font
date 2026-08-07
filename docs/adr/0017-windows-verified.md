@@ -164,11 +164,14 @@ The trigger to reopen this is a new rendering path rather than a new version:
 Windows Terminal changing its text renderer, WSL under a terminal not covered
 here, or a report of shear from either console at a size neither round used.
 
-One experiment is now cheap and was never run: `postbuild.py --suffix " H"`
-exists so a hinted and an unhinted cut can be installed side by side and
-switched in a terminal config, and 14 px on ClearType is the only place the
-answer differs. It would settle whether ttfautohint's CJK stem snapping helps
-here or merely runs — [0010](0010-ttfautohint-hints-y-only.md) records that it
-reaches y only, so it may be doing less than its cost suggests. Not needed for
-1.0.0: what ships renders correctly, and this asks whether it could render
-better.
+Not a trigger: whether the hinting helps. An earlier revision of this record
+proposed running a hinted-against-unhinted comparison as though it were an open
+question. It is not — [0010](0010-ttfautohint-hints-y-only.md) ran it, measured
+stroke crest intensity across ppem 13-17, and closed it: horizontal strokes gain
++21 to +36, vertical strokes gain nothing, and no `-a` value changes that
+because ttfautohint hints in y only. 0010 says in as many words not to sweep
+`-a` again.
+
+Round two is evidence *for* that decision rather than a reason to revisit it.
+0010's trigger to reopen is a complaint about rendering **in a terminal**; at
+14 px, in both Windows terminals, there was none to make.
