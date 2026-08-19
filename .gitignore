@@ -19,3 +19,6 @@ node_modules/
 # archived; these patterns are what stopped them being committed.
 /sources
 /node_modules
+
+# Private context. See .private/README.md and AGENTS.md.
+.private/
