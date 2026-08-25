@@ -39,6 +39,11 @@ Harena Term은 각 문자 체계를 **고유 폭이 셀에 정확히 떨어지�
 | `HarenaTerm-ttf.zip` | 데스크톱 — 터미널, 편집기, 워드프로세서 |
 | `HarenaTerm-woff2.zip` | 웹 — `@font-face`로 브라우저 기반 터미널에 |
 
+WOFF2 네 벌은 `@harena-hq/term-font` npm 패키지로도 배포할 수 있게 구성되어
+있습니다. 해당 이름을 등록하고 배포를 활성화하기 전까지는 Releases가 공식 다운로드
+경로입니다. 관리자 절차는 [`docs/npm-publishing.md`](docs/npm-publishing.md)에
+기록되어 있습니다.
+
 각 압축 파일에 네 벌이 들어 있습니다: `Harena Term K`와 `Harena Term J`의
 Regular, Bold.
 

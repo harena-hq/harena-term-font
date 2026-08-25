@@ -39,6 +39,21 @@ making the claim.
 
 ## [Unreleased]
 
+### Added
+
+- A publish-ready `@harena-hq/term-font` npm distribution with separate K and
+  J CSS entry points, WOFF2-only payloads and the complete licence bundle. The
+  package is assembled from verified release bytes rather than storing fonts
+  in git.
+
+### Changed
+
+- The npm wrapper and the embedded font now carry separate versions. CSS-only
+  `npm-v*` releases reuse byte-identical fonts; `harena.fontVersion` and
+  `SHA256SUMS` keep the payload tied to a specific font release.
+- npm trusted publishing runs in a minimal job that receives only the verified
+  tarball. The upstream font build never holds an OIDC publishing token.
+
 ## [1.0.0] — 2026-08-06
 
 ### Changed

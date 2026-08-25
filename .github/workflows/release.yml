@@ -1,30 +1,47 @@
 name: release
 
-# Tag -> build -> verify -> publish. This is the only way binaries reach
-# anyone, since the repository holds no fonts, so it is load-bearing rather
-# than a convenience. The gate runs between a bad build and a published one.
+# A v* tag releases new font binaries and their npm package. An npm-v* tag
+# releases packaging/CSS changes around an already-recorded font build. Both
+# paths rebuild and verify the font bytes before anything is published.
 
 on:
   push:
-    tags: ['v*']
+    tags: ['v*', 'npm-v*']
   workflow_dispatch:
     inputs:
       tag:
         description: 'Tag to build and publish'
         required: true
 
-permissions:
-  contents: write
+permissions: {}
 
 jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    permissions:
+      contents: write
+    outputs:
+      kind: ${{ steps.release.outputs.kind }}
+      tag: ${{ steps.release.outputs.tag }}
+      package_version: ${{ steps.npm.outputs.version }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v7.0.1
         with:
           ref: ${{ github.event.inputs.tag || github.ref }}
+      - name: Classify the release tag
+        id: release
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          case "$TAG" in
+            v*) kind=font ;;
+            npm-v*) kind=npm ;;
+            *) echo "release tag must start with v or npm-v"; exit 1 ;;
+          esac
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
       - name: Set up Python
         uses: actions/setup-python@v7.0.0
         with:
@@ -36,6 +53,73 @@ jobs:
         with:
           node-version: '24'
           cache: 'pnpm'
+      - name: Read npm package metadata
+        id: npm
+        run: |
+          name=$(node -p "require('./npm/package.json').name")
+          version=$(node -p "require('./npm/package.json').version")
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      # The tag and the font's internal version must be the same number, or a
+      # user installs v0.9.0 and their font manager reports something else.
+      # verify.py asserts head.fontRevision and nameID 5 against VERSION; only
+      # the tag lives outside the build, so it is checked here.
+      - name: Check the tag matches VERSION
+        if: steps.release.outputs.kind == 'font'
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          version=$(python3 scripts/font_version.py)
+          expected="v$(python3 scripts/font_version.py --semver)"
+          echo "VERSION=$version  expected tag=$expected  actual tag=$TAG"
+          [ "$TAG" = "$expected" ] || { echo "tag does not match build.VERSION"; exit 1; }
+
+      - name: Check the npm tag matches the package version
+        if: steps.release.outputs.kind == 'npm'
+        env:
+          PACKAGE_VERSION: ${{ steps.npm.outputs.version }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          [ "$TAG" = "npm-v$PACKAGE_VERSION" ] || {
+            echo "npm tag does not match npm/package.json: npm-v$PACKAGE_VERSION != $TAG"; exit 1;
+          }
+
+      # The registry is authoritative for whether a package version can be
+      # published. Check before the expensive font build, and distinguish the
+      # expected missing-version E404 from connectivity or registry failures.
+      - name: Check the npm version is unused
+        if: vars.NPM_PUBLISH == 'true'
+        env:
+          PACKAGE_NAME: ${{ steps.npm.outputs.name }}
+          PACKAGE_VERSION: ${{ steps.npm.outputs.version }}
+        run: |
+          npm ping --registry https://registry.npmjs.org
+          if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version --json \
+              --registry https://registry.npmjs.org \
+              > /tmp/npm-view.out 2> /tmp/npm-view.err; then
+            echo "$PACKAGE_NAME@$PACKAGE_VERSION already exists: $(cat /tmp/npm-view.out)"
+            exit 1
+          fi
+          if ! grep -q 'E404' /tmp/npm-view.err; then
+            cat /tmp/npm-view.err
+            echo "registry lookup failed without confirming that the version is unused"
+            exit 1
+          fi
+          echo "$PACKAGE_NAME@$PACKAGE_VERSION is unused"
+
+      # Every registry version has its own history even when it rides a font
+      # release tag. Missing notes fail before the build rather than leaving an
+      # undocumented package in npm.
+      - name: Extract npm package release notes
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PACKAGE_VERSION: ${{ steps.npm.outputs.version }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          python3 scripts/release_notes.py "$PACKAGE_VERSION" \
+            --changelog npm/CHANGELOG.md --ref "$TAG" \
+            --out npm-release-notes.md
+
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       # libharfbuzz-bin supplies hb-shape. verify.py skips the NFD shaping
@@ -45,22 +129,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip xz-utils libharfbuzz-bin zip
-
-      # The tag and the font's internal version must be the same number, or a
-      # user installs v0.9.0 and their font manager reports something else.
-      # verify.py asserts head.fontRevision and nameID 5 against VERSION; only
-      # the tag lives outside the build, so it is checked here.
-      - name: Check the tag matches VERSION
-        env:
-          TAG: ${{ github.event.inputs.tag || github.ref_name }}
-        run: |
-          version=$(python3 -c 'import sys; sys.path.insert(0, "scripts"); import build; print(build.VERSION)')
-          # fontRevision is X.YYY: one digit of minor, two of patch.
-          # 0.900 -> v0.9.0, 1.012 -> v1.0.12. Taking one character for the
-          # patch instead of the rest silently turns 0.912 into v0.9.1.
-          expected="v$(echo "$version" | awk -F. '{printf "%d.%d.%d", $1, substr($2,1,1), substr($2,2)+0}')"
-          echo "VERSION=$version  expected tag=$expected  actual tag=$TAG"
-          [ "$TAG" = "$expected" ] || { echo "tag does not match build.VERSION"; exit 1; }
 
       - name: Fetch build sources
         run: scripts/fetch_sources.sh
@@ -80,6 +148,7 @@ jobs:
           cd dist && sha256sum -c ../SHA256SUMS
 
       - name: Package
+        if: steps.release.outputs.kind == 'font'
         run: |
           mkdir -p release
           cp OFL.txt THIRD_PARTY_NOTICES.md SHA256SUMS dist/
@@ -87,6 +156,43 @@ jobs:
           (cd dist && zip -q -r ../release/HarenaTerm-ttf.zip   *.ttf   OFL.txt THIRD_PARTY_NOTICES.md SHA256SUMS licenses)
           (cd dist && zip -q -r ../release/HarenaTerm-woff2.zip *.woff2 OFL.txt THIRD_PARTY_NOTICES.md SHA256SUMS licenses)
           ls -la release/
+
+      # npm/ is the reviewed package contract; this step joins it to the WOFF2
+      # bytes that just passed the conformance and reproducibility gates. Pack
+      # and install the tarball that would be published, not the source folder.
+      - name: Assemble and smoke-test the npm package
+        run: |
+          python3 scripts/test_package_npm.py
+          python3 scripts/package_npm.py
+          mkdir -p release
+          npm pack ./build/npm-package --pack-destination release
+          mkdir -p /tmp/harena-npm-smoke
+          npm install --ignore-scripts --no-audit --no-fund \
+            --prefix /tmp/harena-npm-smoke ./release/harena-hq-term-font-*.tgz
+          cd /tmp/harena-npm-smoke
+          node -e "require.resolve('@harena-hq/term-font/index.css')"
+          node -e "require.resolve('@harena-hq/term-font/package.json')"
+          test -f node_modules/@harena-hq/term-font/fonts/HarenaTermK-Regular.woff2
+
+      # The publisher job receives only this immutable artifact. No checkout,
+      # source build or dependency installation runs with an OIDC token in its
+      # environment.
+      - name: Upload the npm package for publishing
+        if: vars.NPM_PUBLISH == 'true'
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: npm-package
+          path: release/harena-hq-term-font-*.tgz
+          retention-days: 1
+          if-no-files-found: error
+      - name: Upload npm release notes
+        if: steps.release.outputs.kind == 'npm' && vars.NPM_PUBLISH == 'true'
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: npm-release-notes
+          path: npm-release-notes.md
+          retention-days: 1
+          if-no-files-found: error
 
       # Mirror the pinned inputs as release assets. A SHA-256 detects a changed
       # upstream; it cannot resurrect a deleted one, and the day any upstream
@@ -104,6 +210,7 @@ jobs:
       # Font archive carries icon sets that are MIT and CC-BY-4.0 rather than
       # OFL, and two of them require attribution wherever they are redistributed.
       - name: Mirror the pinned sources
+        if: steps.release.outputs.kind == 'font'
         run: |
           mkdir -p release/sources-mirror
           scripts/fetch_sources.sh --list > pinned.txt
@@ -128,8 +235,9 @@ jobs:
       # links -- see its docstring. Doing it here rather than by hand is the
       # point: v0.9.0 and v1.0.0 both shipped ragged notes with 404 links.
       - name: Extract release notes
+        if: steps.release.outputs.kind == 'font'
         env:
-          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+          TAG: ${{ steps.release.outputs.tag }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           python3 scripts/release_notes.py "${TAG#v}" --ref "$TAG" \
@@ -137,9 +245,10 @@ jobs:
           cat release-notes.md
 
       - name: Publish
+        if: steps.release.outputs.kind == 'font'
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+          TAG: ${{ steps.release.outputs.tag }}
         run: |
           gh release create "$TAG" \
             --title "$TAG" \
@@ -147,3 +256,74 @@ jobs:
             release/HarenaTerm-ttf.zip \
             release/HarenaTerm-woff2.zip \
             release/HarenaTerm-sources-mirror.zip
+
+      - name: Report disabled npm publishing
+        if: steps.release.outputs.kind == 'npm' && vars.NPM_PUBLISH != 'true'
+        run: |
+          echo '## npm publishing disabled' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The package was rebuilt and verified, but nothing was published because `NPM_PUBLISH` is not `true`.' >> "$GITHUB_STEP_SUMMARY"
+
+  publish-npm:
+    needs: release
+    if: vars.NPM_PUBLISH == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download the verified package
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: npm-package
+          path: package
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+      - name: Require an npm CLI with trusted-publishing support
+        run: |
+          node_version=$(node --version)
+          npm_version=$(npm --version)
+          node -e '
+            const parse = value => value.replace(/^v/, "").split(".").map(Number);
+            const atLeast = (actual, minimum) => {
+              for (let i = 0; i < minimum.length; i += 1) {
+                if (actual[i] > minimum[i]) return true;
+                if (actual[i] < minimum[i]) return false;
+              }
+              return true;
+            };
+            const node = parse(process.argv[1]);
+            const npm = parse(process.argv[2]);
+            if (!atLeast(node, [22, 14, 0]) || !atLeast(npm, [11, 5, 1])) {
+              console.error(`trusted publishing requires Node >=22.14.0 and npm >=11.5.1; got Node ${process.argv[1]}, npm ${process.argv[2]}`);
+              process.exit(1);
+            }
+          ' "$node_version" "$npm_version"
+      - name: Publish to npm
+        run: npm publish ./package/harena-hq-term-font-*.tgz --access public
+
+  publish-npm-notes:
+    needs: [release, publish-npm]
+    if: needs.release.outputs.kind == 'npm' && vars.NPM_PUBLISH == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download npm release notes
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: npm-release-notes
+          path: notes
+      - name: Publish npm-only release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.release.outputs.tag }}
+          PACKAGE_VERSION: ${{ needs.release.outputs.package_version }}
+        run: |
+          gh release create "$TAG" \
+            --latest=false \
+            --title "@harena-hq/term-font $PACKAGE_VERSION" \
+            --notes-file notes/npm-release-notes.md

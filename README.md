@@ -41,6 +41,11 @@ Grab the latest release from [**Releases**](../../releases/latest).
 | `HarenaTerm-ttf.zip` | desktop — terminals, editors, word processors |
 | `HarenaTerm-woff2.zip` | web — browser-based terminals via `@font-face` |
 
+The WOFF2 faces are also prepared as the `@harena-hq/term-font` npm package.
+Until that namespace is registered and publishing is enabled, Releases remain
+the authoritative download. Maintainer instructions are in
+[`docs/npm-publishing.md`](docs/npm-publishing.md).
+
 Each holds four faces: `Harena Term K` and `Harena Term J`, Regular and Bold.
 
 ## Install

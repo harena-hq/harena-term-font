@@ -1,0 +1,54 @@
+{
+  "name": "@harena-hq/term-font",
+  "version": "1.0.0",
+  "description": "Harena Term, a dual-script terminal font with exact 1:2 cell metrics.",
+  "license": "OFL-1.1 AND Apache-2.0 AND CC-BY-4.0 AND MIT AND Unlicense",
+  "harena": {
+    "fontVersion": "1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harena-hq/harena-term-font.git"
+  },
+  "homepage": "https://github.com/harena-hq/harena-term-font#readme",
+  "bugs": {
+    "url": "https://github.com/harena-hq/harena-term-font/issues"
+  },
+  "keywords": [
+    "font",
+    "terminal",
+    "monospace",
+    "hangul",
+    "korean",
+    "japanese",
+    "cjk",
+    "woff2",
+    "xterm"
+  ],
+  "style": "./index.css",
+  "exports": {
+    ".": "./index.css",
+    "./index.css": "./index.css",
+    "./k.css": "./k.css",
+    "./j.css": "./j.css",
+    "./fonts/*": "./fonts/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "fonts/",
+    "index.css",
+    "k.css",
+    "j.css",
+    "README.md",
+    "CHANGELOG.md",
+    "OFL.txt",
+    "THIRD_PARTY_NOTICES.md",
+    "licenses/"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

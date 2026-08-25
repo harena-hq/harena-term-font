@@ -9,6 +9,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   reproduce:
     runs-on: ubuntu-latest
@@ -27,6 +30,15 @@ jobs:
         with:
           node-version: '24'
           cache: 'pnpm'
+      - name: Check dependency-free release metadata
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 -S scripts/font_version.py --semver
+          package=$(node -p "require('./npm/package.json').version")
+          python3 scripts/release_notes.py "$package" \
+            --changelog npm/CHANGELOG.md --ref HEAD \
+            --out /tmp/npm-release-notes.md
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       # libharfbuzz-bin supplies hb-shape. verify.py *skips* the NFD shaping
@@ -48,6 +60,21 @@ jobs:
         run: python3 scripts/verify.py | tee gate.log && grep -q '^158/158 checks passed' gate.log
       - name: Verify the build is reproducible
         run: cd dist && sha256sum -c ../SHA256SUMS
+      # Exercise the registry-facing contract before a tag exists. This also
+      # proves that an npm-only patch may retain the recorded font version and
+      # that every CSS URL resolves in an installed tarball.
+      - name: Assemble and smoke-test the npm package
+        run: |
+          python3 scripts/test_package_npm.py
+          python3 scripts/package_npm.py
+          mkdir -p /tmp/harena-npm-pack /tmp/harena-npm-smoke
+          npm pack ./build/npm-package --pack-destination /tmp/harena-npm-pack
+          npm install --ignore-scripts --no-audit --no-fund \
+            --prefix /tmp/harena-npm-smoke /tmp/harena-npm-pack/harena-hq-term-font-*.tgz
+          cd /tmp/harena-npm-smoke
+          node -e "require.resolve('@harena-hq/term-font/index.css')"
+          node -e "require.resolve('@harena-hq/term-font/package.json')"
+          test -f node_modules/@harena-hq/term-font/fonts/HarenaTermK-Regular.woff2
       # The gate and the hash check are what this workflow is for; the binaries
       # themselves ship from Releases. Uploading 90 MB on every push would cost
       # storage to duplicate what a tag already produces.

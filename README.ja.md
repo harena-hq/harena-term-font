@@ -41,6 +41,11 @@ Harena Term は各文字体系を、**その固有アドバンスがセルにち
 | `HarenaTerm-ttf.zip` | デスクトップ — ターミナル、エディタ、ワープロ |
 | `HarenaTerm-woff2.zip` | ウェブ — `@font-face` でブラウザ上のターミナルへ |
 
+四つの WOFF2 は `@harena-hq/term-font` npm パッケージとしても配布できる構成に
+なっています。その名前を登録して公開を有効にするまでは、Releases が正式な
+ダウンロード元です。メンテナ向けの手順は
+[`docs/npm-publishing.md`](docs/npm-publishing.md) に記録されています。
+
 各アーカイブに四つの書体が入っています: `Harena Term K` と `Harena Term J` の
 Regular と Bold。
 
