@@ -6,8 +6,9 @@ Notable changes to Harena Term. Binaries are attached to each
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 applied to the font: a **major** bump changes metrics or naming in a way that
-moves existing text, a **minor** bump adds coverage or changes how glyphs are
-drawn, a **patch** bump changes nothing a reader can see.
+moves existing text, a **minor** bump adds coverage or changes the design
+systemically, and a **patch** bump corrects a local glyph defect without
+changing metrics, coverage or naming.
 
 The tag and the font's internal version are kept equal — `head.fontRevision`
 and `nameID 5` read the same number a release is tagged with, so a font manager
@@ -38,6 +39,17 @@ a checked fact, since until then it had only ever been verified on the machine
 making the claim.
 
 ## [Unreleased]
+
+## [1.0.1] — 2026-08-27
+
+### Fixed
+
+- Lower the asterisk to the optical centre shared by the middle dot and plus.
+  Claude Code cycles through `·`, `+`, and `*` as an in-place working
+  indicator; Iosevka's default high asterisk made that animation jump about
+  0.27 em vertically. The Latin source build now selects Iosevka's
+  `penta-low` variant, keeping the final hinted centres within 10 font units in
+  Regular and Bold.
 
 ### Added
 
@@ -179,6 +191,7 @@ and Bold, at 38478 glyphs and 37652 codepoints each.
   See [ADR 0010](docs/adr/0010-ttfautohint-hints-y-only.md).
 - TUI rendering is verified on macOS. **Not verified on Windows.**
 
-[Unreleased]: ../../compare/v1.0.0...HEAD
+[Unreleased]: ../../compare/v1.0.1...HEAD
+[1.0.1]: ../../compare/v1.0.0...v1.0.1
 [1.0.0]: ../../releases/tag/v1.0.0
 [0.9.0]: ../../releases/tag/v0.9.0

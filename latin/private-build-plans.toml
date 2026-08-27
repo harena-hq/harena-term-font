@@ -21,6 +21,12 @@ serifs = "sans"
 noCvSs = true
 exportGlyphNames = false
 
+[buildPlans.HarenaLatin.variants.design]
+# Claude Code animates its working indicator through `·`, `+`, and `*` in one
+# terminal cell. Iosevka's default high asterisk sits about 0.27 em above the
+# other two; the low variant shares their optical centre instead.
+asterisk = "penta-low"
+
 [buildPlans.HarenaLatin.weights.Regular]
 shape = 500
 menu = 400

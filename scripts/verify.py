@@ -195,6 +195,23 @@ def verify(path: str, g: Gate) -> None:
     g.check(not strays, "every advance is 0, 1 or 2 cells",
             f"stray advances: {sorted(strays)[:8]}" if strays else "")
 
+    # Claude Code animates its working indicator in place as `·`, `+`, `*`.
+    # A high typographic asterisk makes that cell jump vertically even though
+    # its advance is correct. The middle dot and plus establish the intended
+    # centre; keep all three on the same optical row within rounding tolerance.
+    indicator_centres = {}
+    for cp in (0x00B7, 0x002B, 0x002A):
+        pen = BoundsPen(gs)
+        gs[cmap[cp]].draw(pen)
+        indicator_centres[cp] = (pen.bounds[1] + pen.bounds[3]) / 2
+    target = (indicator_centres[0x00B7] + indicator_centres[0x002B]) / 2
+    offsets = {cp: centre - target
+               for cp, centre in indicator_centres.items()}
+    g.check(max(abs(offset) for offset in offsets.values()) <= 10,
+            "Claude Code indicator glyphs share one optical centre",
+            ", ".join(f"{chr(cp)} {offset:+.1f}u"
+                      for cp, offset in offsets.items()))
+
     # --- 2. coverage ----------------------------------------------------
     for label, ((lo, hi), want, op) in COVERAGE.items():
         n = sum(1 for cp in range(lo, hi + 1) if cp in cmap)

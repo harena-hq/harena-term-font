@@ -9,6 +9,13 @@ this package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-08-27
+
+### Changed
+
+- Package Harena Term 1.0.1, which aligns the `*` working-indicator glyph with
+  `·` and `+` in terminal animations.
+
 ## [1.0.0] — 2026-08-24
 
 ### Added
@@ -17,5 +24,6 @@ this package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and Bold WOFF2 faces, separate CSS entry points, package-relative font
   exports and the complete redistribution notices.
 
-[Unreleased]: ../../../compare/v1.0.0...HEAD
+[Unreleased]: ../../../compare/v1.0.1...HEAD
+[1.0.1]: ../../../compare/v1.0.0...v1.0.1
 [1.0.0]: ../../../releases/tag/v1.0.0
