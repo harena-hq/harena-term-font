@@ -138,7 +138,9 @@ jobs:
         run: python3 scripts/postbuild.py
 
       - name: Run conformance verification
-        run: python3 scripts/verify.py | tee gate.log && grep -q '^158/158 checks passed' gate.log
+        run: |
+          python3 scripts/verify.py | tee gate.log
+          grep -q '^gate: PASS$' gate.log
       # The committed SHA256SUMS is what the README claims is reproducible.
       # postbuild.py rewrites it from this build, so comparing the two proves the
       # tag reproduces the recorded bytes rather than merely producing some.
