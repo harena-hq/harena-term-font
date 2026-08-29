@@ -43,7 +43,7 @@ jobs:
         run: pip install -r requirements.txt
       # libharfbuzz-bin supplies hb-shape. verify.py *skips* the NFD shaping
       # check when it is absent rather than failing, so without this the gate
-      # would quietly run 145 checks and still report success.
+      # would quietly run 162 checks and still report success.
       - name: Install system dependencies
         run: |
           sudo apt-get update

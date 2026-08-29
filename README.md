@@ -136,12 +136,14 @@ cd dist && sha256sum -c ../SHA256SUMS
 ```
 
 `verify.py` **asserts rather than reports** — its exit code is the gate, and it
-runs **158 checks** across all four faces: every advance re-derived from the
+runs **166 checks** across all four faces: every advance re-derived from the
 binary and checked against the width provider across all 21349 covered
 codepoints, every full-width glyph scanned for cell overflow, all 11172 NFD
 syllables walked through the `ccmp` ligature tree, letterspacing and the
 hangul-to-han stroke ratio measured against Pretendard's own, `OS/2` script
-declarations, and the reproducibility stamp on the shipped bytes.
+declarations, every hangul syllable rasterised at 13-18 ppem to prove the
+hinting erases no horizontal bar the design draws, and the reproducibility
+stamp on the shipped bytes.
 
 Set `SOURCE_DATE_EPOCH` to override the build stamp. CI runs the whole sequence
 and checks the hashes on every push.

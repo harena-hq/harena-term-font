@@ -48,7 +48,7 @@ IOS_DIR = "sources/cand/IosevkaTerm"
 PJP = "sources/pjp/public/variable/PretendardJPVariable.ttf"
 OUT = "dist"
 
-VERSION = "1.001"
+VERSION = "1.002"
 VENDOR = "HRNA"
 
 # Reproducible builds. Two builds from identical inputs differed in exactly one
@@ -60,7 +60,7 @@ VENDOR = "HRNA"
 # `created` is inherited from the Iosevka base, which stamps its own build time,
 # so it has to be overwritten rather than left alone. Bump this with VERSION.
 # SOURCE_DATE_EPOCH overrides it, following the reproducible-builds convention.
-SOURCE_DATE = int(os.environ.get("SOURCE_DATE_EPOCH", "1787788800"))  # 2026-08-27
+SOURCE_DATE = int(os.environ.get("SOURCE_DATE_EPOCH", "1787961600"))  # 2026-08-29
 
 
 def stamp(font: TTFont) -> None:

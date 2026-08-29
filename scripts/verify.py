@@ -29,6 +29,11 @@ from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 from fontTools.misc.timeTools import timestampSinceEpoch
 
+try:
+    import freetype
+except ImportError:  # the stroke-erasure check is skipped, loudly, without it
+    freetype = None
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build  # noqa: E402  -- needs the path above when run from elsewhere
 
@@ -75,6 +80,77 @@ SOURCE_STROKE_RATIO = {
     "Bold": {"vertical": 1.1461, "horizontal": 0.9449},
 }
 
+# Hinting must not erase a horizontal stroke the design draws.
+#
+# ttfautohint grid-fits horizontal edges. Where a stroke's top and bottom round
+# onto the same pixel its height becomes zero and the stroke is simply gone: on
+# the defaults, ㅌ's three bars came out as two at 15 and 16 ppem, so 텰 read as
+# 뎔, and the top arc of ㅇ opened. `postbuild.HINT_ARGS` is what stops that;
+# this check is what keeps it stopped. See docs/adr/0019.
+#
+# Two mistakes were made building this and both are worth not repeating.
+#
+# Counting strokes against the unhinted render and demanding equality does not
+# work -- hinting legitimately merges two faint strokes into one crisp one, and
+# that reads better, not worse. Measured, that reports 14737 failures where a
+# reader sees two. So the question is the narrower one a reader notices: a
+# stroke the unhinted outline draws at >=50% coverage must still be drawn, at
+# >=25%, within +/-2 rows of where it was. The tolerance is measured rather
+# than guessed -- over 2235 syllables at 16 and 17 ppem, hinting never moved a
+# glyph's ink top by more than 2 rows.
+#
+# And a run of four dark columns is not yet a bar. At these sizes the shallow
+# tail of a diagonal -- ㅅ ㅈ ㅊ ㄱ -- makes exactly four, and those swamp the
+# real thing: with a flat four-column floor the shipped font reports 569
+# "erasures", every one of them four columns wide and none of them a bar.
+# Requiring a run to span a third of the glyph's own ink separates them. The
+# fraction is used as-is, and the reason is narrower than it looks: a `max(4,
+# ...)` floor is inert (measured, 39 and 0, unchanged -- it can only bind below
+# an 11.43 px glyph, where it makes the check stricter). What brought the
+# residue back was rounding the fraction to an integer first, `max(4, int(...))`
+# giving 307 and 226. Truncation is the hazard here, not the floor.
+#
+# One inconsistency to know about: below an 11.43 px glyph the fraction falls
+# under 4, so a four-column run is admitted after all -- the thing this
+# paragraph says is not a bar. That is 1.0% of renders in this range (w = 11 at
+# 13 ppem) and it costs nothing measured, but the code and this prose disagree
+# there.
+#
+# Measured on the 1.0.1 binaries, which had the defect, it flags 39 -- all of
+# them at 15 and 16 ppem, which are the two sizes that were reported, and among
+# them 텰 at both and 열 at 15. On 1.0.2 it flags none, in either weight and
+# either cut. So the assertion is zero. That trades a fitted count for a fitted
+# threshold rather than removing the fitting -- but it is a far better trade: a
+# budget that is mostly noise absorbs a real regression, since 30 bars could go
+# missing while 30 diagonals stopped being miscounted and the total would not
+# move, and the whole 1.0.1 defect is only 39 incidents. Where the count swung
+# by hundreds on a two-flag change, this threshold's answer holds from 0.35 to
+# 0.50. It still needs refitting if the noise floor moves.
+#
+# BAR_MIN_WIDTH was chosen rather than derived, and the rule it was chosen by is
+# the part worth keeping: **the smallest fraction at which the shipped font is
+# clean** -- most sensitive, subject to no false positives. Below it there is no
+# margin at all (1.0.2 reports 4 at 0.32 and 95 at 0.30). Above it the answer is
+# stable: 0.35 through 0.50 all report zero on 1.0.2 while still catching 34-39
+# on 1.0.1, so the conclusion survives anywhere in that band. 0.35 is the only
+# value in it that also catches 열 at 15 ppem, one of the two syllables that
+# were reported. Re-derive by the rule, not by copying the number.
+#
+# Two things this does not cover. 열 at 16 ppem, where the top arc of ㅇ was
+# also erased: a circle's arc is not a bar, and there its run is 4 columns of a
+# 15 px glyph, 27%, below the threshold that makes the check mean anything. The
+# check is named for bars because bars are what it asserts.
+#
+# And Bold has no positive control. It reports 0 on the 1.0.1 binaries too, so
+# this check has never been shown to detect anything in that weight -- it is
+# proven against Regular and assumed to transfer.
+#
+# 13-18 ppem is the range a terminal is read at on a 96-110 DPI display, and
+# where grid-fitting arbitrates at all; ADR 0017 verified Windows at 14, and
+# the report that started this was at 16.
+HINTING_STROKE_RANGE = range(13, 19)
+BAR_MIN_WIDTH = 0.35
+
 
 class Gate:
     def __init__(self) -> None:
@@ -119,6 +195,90 @@ def bar(font, upm, ch, gs=None):
     p = BoundsPen(gs)
     gs[gn].draw(p)
     return (p.bounds[3] - p.bounds[1]) / upm if p.bounds else None
+
+
+def _rows(face, ch, ppem, hinted):
+    """Rasterise one glyph and return its rows as lists of coverage bytes,
+    plus the ink top, so hinted and unhinted renders can be aligned."""
+    flags = freetype.FT_LOAD_RENDER
+    if not hinted:
+        flags |= freetype.FT_LOAD_NO_HINTING
+    face.set_pixel_sizes(0, ppem)
+    face.load_char(ch, flags)
+    b = face.glyph.bitmap
+    if not (b.rows and b.width):
+        return [], 0
+    buf = b.buffer
+    return ([buf[y * b.pitch:y * b.pitch + b.width] for y in range(b.rows)],
+            face.glyph.bitmap_top)
+
+
+def _bars(row, floor, least):
+    """(start, end) of every run of at least `least` adjacent columns at or
+    above floor. See BAR_MIN_WIDTH for why the threshold is not simply 1."""
+    out, start = [], None
+    for i, v in enumerate(row):
+        if v >= floor and start is None:
+            start = i
+        elif v < floor and start is not None:
+            if i - start >= least:
+                out.append((start, i))
+            start = None
+    if start is not None and len(row) - start >= least:
+        out.append((start, len(row)))
+    return out
+
+
+def _kept(rows, y, x0, x1, floor, tol, share=0.6):
+    """Is a bar spanning [x0, x1) still drawn within tol rows of y?
+
+    `share` of its columns must survive. A flat minimum alongside the fraction
+    would make the demand non-monotonic -- max(4, int(w * 0.6)) asks for 100% of
+    a 4-wide run but only 50% of an 8-wide one, loosest in the middle of the
+    range this calls a bar -- so the fraction stands alone, as in `_bars`.
+    """
+    for dy in range(-tol, tol + 1):
+        if not 0 <= y + dy < len(rows):
+            continue
+        seg = rows[y + dy][x0:x1]
+        if seg and sum(v >= floor for v in seg) >= share * len(seg):
+            return True
+    return False
+
+
+def erased_strokes(path, ppems=HINTING_STROKE_RANGE):
+    """(syllable, ppem) pairs whose hinted render loses a horizontal stroke the
+    unhinted outline draws solidly. See BAR_MIN_WIDTH for the rules."""
+    SOLID, PRESENT, TOL = 128, 64, 2
+    face = freetype.Face(path)
+    lost = []
+    for cp in range(0xAC00, 0xD7A4):
+        ch = chr(cp)
+        for ppem in ppems:
+            plain, plain_top = _rows(face, ch, ppem, hinted=False)
+            hinted, hinted_top = _rows(face, ch, ppem, hinted=True)
+            if not plain or not hinted:
+                continue
+            shift = plain_top - hinted_top
+            width = len(hinted[0])
+            least = BAR_MIN_WIDTH * len(plain[0])
+            # A stroke spans several rows; test its topmost row only, or a 2px
+            # bar counts twice and a legitimate merge reads as a deletion.
+            above_was_bar = False
+            for y, row in enumerate(plain):
+                bars = _bars(row, SOLID, least)
+                if not bars:
+                    above_was_bar = False
+                    continue
+                if above_was_bar:
+                    continue
+                above_was_bar = True
+                if any(not _kept(hinted, y - shift, x0, min(x1, width),
+                                 PRESENT, TOL)
+                       for x0, x1 in bars if min(x1, width) - x0 >= least):
+                    lost.append((ch, ppem))
+                    break
+    return lost
 
 
 def stem(font, upm, ch, gs=None):
@@ -543,6 +703,19 @@ def verify(path: str, g: Gate) -> None:
         g.check(not stray, "K and J cuts differ only inside the han range",
                 (f"{len(stray)} stray: "
                  + " ".join(f"U+{c:04X}" for c in stray[:8])) if stray else "")
+
+    # --- 8. hinting must not erase a horizontal stroke ------------------
+    lo, hi = HINTING_STROKE_RANGE[0], HINTING_STROKE_RANGE[-1]
+    label = f"hinting erases no hangul bar at {lo}-{hi} ppem"
+    if freetype is None:
+        # Announced, not silently skipped: a gate that runs one check short and
+        # still says PASS is worse than one that says it could not run.
+        print(f"  [SKIP] {label}  (pip install freetype-py)")
+    else:
+        lost = erased_strokes(path)
+        g.check(not lost, label,
+                " ".join(f"{c}@{ppem}" for c, ppem in lost[:8]) if lost
+                else f"11172 syllables x {hi - lo + 1} sizes")
 
     base.close()
     f.close()

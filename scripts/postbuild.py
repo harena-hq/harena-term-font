@@ -32,8 +32,21 @@ unhinted CJK at 13px on a 96 DPI display has stems landing off the pixel grid.
 Sarasa hints its CJK, so shipping without this would be a visible regression on
 the one platform not yet tested.
 
-ttfautohint leaves the existing Latin instructions alone -- measured byte for
-byte on 'H' and U+2502 -- and generates hints for everything else.
+ttfautohint generates every instruction in the shipped font, including the
+Latin's. Measured: feed it Iosevka's hinted `TTF/` build or its `TTF-Unhinted`
+one and the output is byte-identical in `glyf`, `prep`, `fpgm` and `cvt` -- even
+though the unhinted base carries no `prep`, `fpgm` or `cvt` at all. Nothing of
+the base's own hinting survives, which is why the blue-zone options below move
+the Latin as well as the hangul.
+
+`build.py` reads the hinted `TTF/` build (CUSTOM; CUSTOM_UNHINTED is a fallback
+for a tree without it), and that base's Latin bytecode happens to come out of
+ttfautohint unchanged -- 'H' is 39 bytes either way, and `cvt` is byte-equal.
+That coincidence is easy to misread as survival, and was. It is not a
+coincidence at all: `TTF/` stamps `Version 34.8.0; ttfautohint (v1.8.4.16-eb64)`
+into its name table where `TTF-Unhinted/` stamps only `Version 34.8.0`, so
+Iosevka hinted with this same tool. A different build of it, which is why `fpgm`
+is 3605 bytes there and 3596 here while `H` and `cvt` land identically.
 
 The family suffix is deliberate: it lets the hinted and unhinted cuts be
 installed side by side on Windows and switched in a terminal config, which is
@@ -59,6 +72,30 @@ from build import stamp
 
 HINTER = "build/bin/ttfautohint"
 OUT = "dist"
+
+# Blue-zone rounding, and why the shipping build does not take the defaults.
+#
+# ttfautohint's defaults erase horizontal strokes the design draws solidly: at
+# 15 and 16 ppem the three bars of ㅌ came out as two, so 텰 read as 뎔, and the
+# top arc of ㅇ opened. Not every syllable -- 8 of the 588 with a ㅌ initial at
+# 15 ppem and 9 at 16, and 티/타/토/투 are all clean. Only crowded combinations
+# break, which is why a per-jamo spot check would not have found it, and not ㅌ
+# alone: of the 39 the gate flags on 1.0.1 the initials are ㄹ 19, ㅌ 17, ㅇ 2,
+# ㅋ 1. See docs/adr/0019.
+#
+# `-a` cannot fix it. That option selects stem *width* quantisation, and this is
+# a stroke *position* failure: the bar's edges round onto each other and its
+# height becomes zero. Moving `-a` to `s` masks the symptom at the cost of
+# glyph-to-glyph uniformity, which is the trade ADR 0010 already weighed and
+# settled -- so 0010's conclusion stands and these options sit beside it.
+#
+# `-x 20` extends x-height rounding-up through 20 ppem (default 14) and fixes
+# 16; `-X 15` exempts 15 ppem from that rounding and fixes 15. Both are fitted
+# constants, found by search over the option space and measured against every
+# one of the 11172 syllables -- not derived. A rebuild at different weights
+# could need refitting, which is why `verify.py` asserts the *property* they
+# buy rather than the values themselves.
+HINT_ARGS = ["-x", "20", "-X", "15"]
 
 
 def sha256(path: str) -> str:
@@ -112,15 +149,23 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--suffix", default="",
                     help="appended to the family and file name, so competing "
-                         "cuts can be installed at once. Empty by default: the "
-                         "shipping font is hinted in place, since ttfautohint's "
-                         "own defaults beat every tuning tried against them.")
+                         "cuts can be installed at once and switched in a "
+                         "terminal config. Empty by default: the shipping font "
+                         "is hinted in place.")
     ap.add_argument("--out", default=OUT,
                     help="output directory; the default overwrites dist in "
                          "place, since the unhinted intermediate has no use "
                          "of its own")
     ap.add_argument("--args", default="",
-                    help="extra ttfautohint arguments, space separated. "
+                    help="extra ttfautohint arguments, space separated, "
+                         "appended after the shipping set "
+                         f"{' '.join(HINT_ARGS)}. ttfautohint takes the last "
+                         "occurrence of a repeated option -- measured, "
+                         "`-x 20 -x 0` and `-x 0` produce identical glyf, "
+                         "prep, fpgm and cvt -- so an experiment overrides by "
+                         "restating the option, e.g. `-x 14` for the stock "
+                         "value. It cannot clear -X: that needs an empty "
+                         "argument and this string is split on whitespace. "
                          "-a picks the stem width mode for grayscale, GDI and "
                          "DirectWrite in that order: n natural, q quantized, "
                          "s strong. The default is qsq, so a modern Windows "
@@ -139,7 +184,7 @@ def main() -> int:
         print("no fonts to hint", file=sys.stderr)
         return 1
 
-    extra = args.args.split()
+    extra = HINT_ARGS + args.args.split()
     os.makedirs(args.out, exist_ok=True)
     print(f"{'face':34s} {'before':>9s} {'after':>9s} {'hinted glyphs':>15s}")
     print("-" * 72)

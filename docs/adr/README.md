@@ -38,7 +38,7 @@ alternatives that lost and why, and the mistakes that produced a rule.
 
 | ADR | decision |
 |---|---|
-| [0010](0010-ttfautohint-hints-y-only.md) | ttfautohint hints in **y only** — measured, horizontal strokes gain +21 to +36 and vertical strokes gain nothing. No `-a` value touches x, so that search space is closed. VTT is the tool that could, with the trigger recorded. |
+| [0010](0010-ttfautohint-hints-y-only.md) | ttfautohint hints in **y only** — measured, horizontal strokes gain +21 to +36 and vertical strokes gain nothing. No `-a` value touches x, so that search space is closed. VTT is the tool that could. **The reopen trigger fired — see [0019](0019-the-hinting-failure-was-position-not-width.md). The unqualified "do not sweep `-a`" was too broad (slot 3 does change the render); `-a` still keeps its value, for a different reason, and "ship the defaults" is superseded.** |
 
 ## Distribution
 
@@ -46,8 +46,9 @@ alternatives that lost and why, and the mistakes that produced a rule.
 |---|---|
 | [0016](0016-no-install-scripts.md) | **No install scripts.** One of the four reference repositories ships them; the two with the widest reach use package managers instead. The OS already installs a font, a package manager also handles upgrade and uninstall, and the download path coupled the project to its own URL shape — which failed silently, returning 404, for as long as the repository was private. The Windows script was shipped having never been executed. |
 | [0018](0018-npm-wraps-an-immutable-font-release.md) | The npm package is a **versioned wrapper around an immutable font release**. Its package version may advance for CSS or metadata while `harena.fontVersion` and `SHA256SUMS` pin the unchanged font bytes. `v*` tags release fonts plus npm; `npm-v*` tags release only the wrapper. Publishing happens in a minimal OIDC job that never runs the upstream build. |
+| [0019](0019-the-hinting-failure-was-position-not-width.md) | The hinting failure was stroke **position**, not stroke width: a bar's edges rounded together and its height became zero, so `ㅌ` lost a bar and `텰` read as `뎔`. `-x 20 -X 15` move blue-zone rounding and fix it; `-a` stays where 0010 put it. The gate rasterises all 11172 syllables at 13-18 ppem and asserts no bar is erased. |
 | [0017](0017-windows-verified.md) | **Windows verified**, closing the last 1.0.0 condition. The 48-column frame's right edge lands on the same x for all eight rows — zero shear under DirectWrite — ambiguous width agrees with the terminal's default, NFD composes, box joins close, and Bold shares Regular's advances. A second round on the physical machine closed it at an em of **14 px**, in Windows Terminal and conhost both, after the first rendered at 200% because a Remote Desktop scale setting is not the scale it renders at. One platform difference found: conhost gives every conjoining jamo a cell, so NFD Korean runs wider there than the 2/0/0 the font declares and Windows Terminal honours. Word was not run. |
-| [0015](0015-ttf-and-woff2-only.md) | TTF and WOFF2 only. OTF is declined structurally — CFF discards the ttfautohint work on all 36859 hinted glyphs, curve conversion moves points the cell measurements have no room for, and the 158 checks read `glyf`. TTC is declined on arithmetic: a collection shares byte-identical **tables**, not glyphs, and 611 differing glyphs keep all 17.66 MB of `glyf` duplicated — **0.6% saved**. |
+| [0015](0015-ttf-and-woff2-only.md) | TTF and WOFF2 only. OTF is declined structurally — CFF discards the ttfautohint work on all 36859 hinted glyphs, curve conversion moves points the cell measurements have no room for, and the 166 checks read `glyf`. TTC is declined on arithmetic: a collection shares byte-identical **tables**, not glyphs, and 611 differing glyphs keep all 17.66 MB of `glyf` duplicated — **0.6% saved**. |
 
 ## Identity
 

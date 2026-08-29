@@ -1,6 +1,9 @@
 # 0010 — ttfautohint hints in y only; the `-a` search space is closed
 
-Status: **permanent**. Records a closed avenue so it is not swept again.
+Status: **partly superseded**. The decision to leave `-a` alone survives; the
+ground given for it, and the instruction to ship ttfautohint's defaults, do not.
+The reopen trigger below fired — see
+[0019](0019-the-hinting-failure-was-position-not-width.md).
 
 ## Context
 
@@ -55,8 +58,12 @@ Sarasa's CJK hinting reaches x; ours cannot.
 
 ## Decision
 
-Ship ttfautohint defaults. **Do not sweep `-a` combinations** — the avenue is
-closed by the tool's design, not by a near miss.
+**Do not sweep `-a` combinations** — the avenue is closed by the tool's design,
+not by a near miss.
+
+~~Ship ttfautohint defaults.~~ Superseded: the build passes `-x 20 -X 15`, which
+act on blue-zone rounding rather than stem width. See the addendum below and
+[0019](0019-the-hinting-failure-was-position-not-width.md).
 
 The tool that could fix this is Microsoft Visual TrueType, which is free (GUI
 closed and Windows-only; the compilers are MIT at `microsoft/VisualTrueType`).
@@ -73,3 +80,26 @@ Where a browser-based terminal rasterises glyphs to an *opaque* Canvas2D surface
 Chromium's condition for letting Skia use LCD subpixel antialiasing is met, and
 that is the favourable case — checked on Windows and acceptable. A transparent
 surface falls back to grayscale, where the missing x hints show.
+
+## Reopened, and what survived
+
+The trigger fired: `텰` read as `뎔` in a terminal at 15 and 16 ppem. `-a` was
+swept again, in contradiction of the instruction above, and the instruction was
+the thing that turned out to be wrong. It was written unqualified from a single
+cut, `-a nsq`, and generalised.
+
+Two results, both in [0019](0019-the-hinting-failure-was-position-not-width.md):
+
+- The `-a nsq` cut compared above moves slot 1, **grayscale**. The renderer
+  takes slot 3, DirectWrite. That is why it read identically — the null result
+  was real but it measured a slot nothing was using.
+- Slot 3 does change the render, and does not fix the defect: the failure is a
+  stroke *position* rounding to zero height, which stem-width quantisation
+  cannot reach. It masks one symptom and costs glyph-to-glyph uniformity,
+  exactly the trade this ADR weighed.
+
+So `-a` keeps its shipping value, but not for the reason given here. "No `-a`
+value changes that" is false of slot 3; what is true is that the change it makes
+does not fix the defect and costs uniformity. And the bare instruction to "ship
+ttfautohint defaults" no longer holds at all: the build passes `-x 20 -X 15`,
+which act on blue-zone rounding rather than stem width.

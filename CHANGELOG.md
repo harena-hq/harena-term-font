@@ -40,6 +40,44 @@ making the claim.
 
 ## [Unreleased]
 
+## [1.0.2] — 2026-08-29
+
+### Fixed
+
+- **Hinting no longer erases horizontal strokes at terminal sizes.** At 15 and
+  16 ppem ttfautohint's defaults rounded a bar's two edges onto the same pixel,
+  leaving it zero pixels tall: `ㅌ` came out with two bars instead of three, so
+  `텰` read as `뎔`, and the top arc of `ㅇ` opened. The build now passes
+  `-x 20 -X 15`, which move blue-zone rounding — the axis the failure was
+  actually on. Measured over all 11172 syllables at 13-18 ppem, bars erased by
+  hinting fall from 39 to 0 in Regular, with glyph-to-glyph uniformity held at
+  the previous value. Bold measured 0 before and after, so the improvement
+  there is claimed only for Regular. See
+  [ADR 0019](docs/adr/0019-the-hinting-failure-was-position-not-width.md).
+
+  The stem-width option `-a` cannot reach this and is left at its shipping
+  value, so [ADR 0010](docs/adr/0010-ttfautohint-hints-y-only.md)'s conclusion
+  stands. 0010's null result is now explained: the cut it compared moved the
+  grayscale slot, and the renderer takes the DirectWrite one.
+
+### Added
+
+- A conformance check that rasterises every hangul syllable at 13-18 ppem and
+  asserts that hinting erases no horizontal bar the design draws solidly. It
+  fails on the 1.0.1 binaries, at 15 and 16 ppem and nowhere else, which is
+  what makes it worth having. The gate is 166 checks. `freetype-py` joins the
+  pinned requirements for it; the check announces itself as skipped rather than
+  passing silently if the module is absent.
+
+### Changed
+
+- The Latin sits a pixel differently at two sizes, as a consequence of the
+  blue-zone change: `H` is 12 px rather than 13 at 15 ppem — the unhinted
+  design's own height, measuring rows at coverage 64/255 or more — and 14 rather
+  than 13 at 16 ppem, with `x` and `o` going 9 to 10 there. Accepted deliberately;
+  [ADR 0004](docs/adr/0004-latin-advance-sets-the-hangul-ceiling.md) already
+  sets the Latin small against the hangul.
+
 ## [1.0.1] — 2026-08-27
 
 ### Fixed
@@ -191,7 +229,8 @@ and Bold, at 38478 glyphs and 37652 codepoints each.
   See [ADR 0010](docs/adr/0010-ttfautohint-hints-y-only.md).
 - TUI rendering is verified on macOS. **Not verified on Windows.**
 
-[Unreleased]: ../../compare/v1.0.1...HEAD
+[Unreleased]: ../../compare/v1.0.2...HEAD
+[1.0.2]: ../../compare/v1.0.1...v1.0.2
 [1.0.1]: ../../compare/v1.0.0...v1.0.1
 [1.0.0]: ../../releases/tag/v1.0.0
 [0.9.0]: ../../releases/tag/v0.9.0
