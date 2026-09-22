@@ -1,0 +1,7 @@
+tar-ignore = ".private"
+tar-ignore = "lab"
+tar-ignore = "node_modules"
+tar-ignore = "sources"
+tar-ignore = "build"
+tar-ignore = ".omc"
+tar-ignore = ".omx"
