@@ -69,6 +69,7 @@ import sys
 from fontTools.ttLib import TTFont
 
 from build import stamp
+import spinner_hinting
 
 HINTER = "build/bin/ttfautohint"
 OUT = "dist"
@@ -119,17 +120,43 @@ def out_name(src: str, suffix: str) -> str:
     return f"{stem}{tag}-{style}" if stem else base
 
 
-def hint(src: str, dst: str, suffix: str, extra: list[str]) -> tuple[int, int]:
-    """Hint src into dst. ttfautohint cannot write over its own input, so an
-    in-place run goes through a temporary file and is moved into position."""
-    before = os.path.getsize(src)
-    inplace = os.path.abspath(src) == os.path.abspath(dst)
-    tmp = dst + ".tmp" if inplace else dst
+def _run_hinter(src: str, dst: str, suffix: str, extra: list[str],
+                control: str | None = None) -> None:
     cmd = [HINTER, "--no-info", "-f", "none"]
     if suffix:
         cmd += ["--family-suffix", suffix]
-    cmd += extra + [src, tmp]
+    if control:
+        cmd += ["--control-file", control]
+    cmd += extra + [src, dst]
     subprocess.run(cmd, check=True, capture_output=True)
+
+
+def hint(src: str, dst: str, suffix: str, extra: list[str]) -> tuple[int, int]:
+    """Hint src into dst. ttfautohint cannot write over its own input, so an
+    in-place run goes through a temporary file and is moved into position.
+
+    A first pass is a probe: spinner_hinting measures where ttfautohint put
+    Claude Code's six animation frames and writes per-size vertical deltas.
+    The final pass starts again from src with those control instructions, so
+    no hinted outline is ever fed back through ttfautohint.
+    """
+    before = os.path.getsize(src)
+    inplace = os.path.abspath(src) == os.path.abspath(dst)
+    tmp = dst + ".tmp" if inplace else dst
+    probe = tmp + ".spinner-probe.ttf"
+    control = tmp + ".spinner-control.txt"
+    try:
+        _run_hinter(src, probe, suffix, extra)
+        _rows, corrections = spinner_hinting.measure(src, probe)
+        with open(control, "w", encoding="utf-8") as fh:
+            fh.write(spinner_hinting.control_text(src, corrections))
+        _run_hinter(src, tmp, suffix, extra, control)
+    finally:
+        for path in (probe, control):
+            try:
+                os.remove(path)
+            except FileNotFoundError:
+                pass
     if inplace:
         os.replace(tmp, dst)
     return before, os.path.getsize(dst)
