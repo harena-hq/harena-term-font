@@ -69,6 +69,7 @@ import sys
 from fontTools.ttLib import TTFont
 
 from build import stamp
+import spinner_hinting
 
 HINTER = "build/bin/ttfautohint"
 OUT = "dist"
@@ -119,17 +120,65 @@ def out_name(src: str, suffix: str) -> str:
     return f"{stem}{tag}-{style}" if stem else base
 
 
-def hint(src: str, dst: str, suffix: str, extra: list[str]) -> tuple[int, int]:
-    """Hint src into dst. ttfautohint cannot write over its own input, so an
-    in-place run goes through a temporary file and is moved into position."""
-    before = os.path.getsize(src)
-    inplace = os.path.abspath(src) == os.path.abspath(dst)
-    tmp = dst + ".tmp" if inplace else dst
+def _run_hinter(src: str, dst: str, suffix: str, extra: list[str],
+                control: str | None = None) -> None:
     cmd = [HINTER, "--no-info", "-f", "none"]
     if suffix:
         cmd += ["--family-suffix", suffix]
-    cmd += extra + [src, tmp]
+    if control:
+        cmd += ["--control-file", control]
+    cmd += extra + [src, dst]
     subprocess.run(cmd, check=True, capture_output=True)
+
+
+def hint(src: str, dst: str, suffix: str, extra: list[str]) -> tuple[int, int]:
+    """Hint src into dst and converge the spinner onto one vertical phase.
+
+    Every iteration starts from the original source. The previous control-file
+    shift is accumulated with the newly measured residual; hinted output is
+    never fed back through ttfautohint. A non-converging correction is a build
+    failure rather than a font that silently violates the raster gate.
+    """
+    spinner_hinting.require_freetype_version()
+    before = os.path.getsize(src)
+    inplace = os.path.abspath(src) == os.path.abspath(dst)
+    tmp = dst + ".tmp" if inplace else dst
+    probe = tmp + ".spinner-probe.ttf"
+    control = tmp + ".spinner-control.txt"
+    shifts = {ch: {} for ch in spinner_hinting.SPINNER}
+    try:
+        for iteration in range(spinner_hinting.MAX_ITERATIONS):
+            if iteration == 0:
+                _run_hinter(src, probe, suffix, extra)
+            else:
+                with open(control, "w", encoding="utf-8") as fh:
+                    fh.write(spinner_hinting.control_text(src, shifts))
+                _run_hinter(src, probe, suffix, extra, control)
+
+            rows, residuals = spinner_hinting.measure(src, probe)
+            worst, ppem = spinner_hinting.worst_spread(rows)
+            if spinner_hinting.converged(rows):
+                os.replace(probe, tmp)
+                break
+
+            if not spinner_hinting.accumulate(shifts, residuals):
+                raise RuntimeError(
+                    "spinner hinting stalled at "
+                    f"{worst:.3f}px spread at {ppem} ppem"
+                )
+        else:
+            worst, ppem = spinner_hinting.worst_spread(rows)
+            raise RuntimeError(
+                "spinner hinting did not converge after "
+                f"{spinner_hinting.MAX_ITERATIONS} iterations: "
+                f"{worst:.3f}px spread at {ppem} ppem"
+            )
+    finally:
+        for path in (probe, control):
+            try:
+                os.remove(path)
+            except FileNotFoundError:
+                pass
     if inplace:
         os.replace(tmp, dst)
     return before, os.path.getsize(dst)

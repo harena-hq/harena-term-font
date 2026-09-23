@@ -294,6 +294,9 @@ def stem(font, upm, ch, gs=None):
 
 def verify(path: str, g: Gate) -> None:
     print(f"\n=== {os.path.basename(path)} ===")
+    if freetype is not None:
+        import spinner_hinting
+        spinner_hinting.require_freetype_version()
     f = TTFont(path)
     upm = f["head"].unitsPerEm
     cmap = f.getBestCmap()
@@ -355,22 +358,22 @@ def verify(path: str, g: Gate) -> None:
     g.check(not strays, "every advance is 0, 1 or 2 cells",
             f"stray advances: {sorted(strays)[:8]}" if strays else "")
 
-    # Claude Code animates its working indicator in place as `·`, `+`, `*`.
-    # A high typographic asterisk makes that cell jump vertically even though
-    # its advance is correct. The middle dot and plus establish the intended
-    # centre; keep all three on the same optical row within rounding tolerance.
-    indicator_centres = {}
-    for cp in (0x00B7, 0x002B, 0x002A):
-        pen = BoundsPen(gs)
-        gs[cmap[cp]].draw(pen)
-        indicator_centres[cp] = (pen.bounds[1] + pen.bounds[3]) / 2
-    target = (indicator_centres[0x00B7] + indicator_centres[0x002B]) / 2
-    offsets = {cp: centre - target
-               for cp, centre in indicator_centres.items()}
-    g.check(max(abs(offset) for offset in offsets.values()) <= 10,
-            "Claude Code indicator glyphs share one optical centre",
-            ", ".join(f"{chr(cp)} {offset:+.1f}u"
-                      for cp, offset in offsets.items()))
+    # Claude Code animates `· ✢ ✳ ✶ ✻ ✽` in one terminal cell. Their source
+    # outlines share a centre, but independent grid fitting can put successive
+    # frames on different sub-pixel phases and make the indicator bob.
+    label = "Claude Code spinner keeps one hinted vertical phase"
+    if freetype is None:
+        print(f"  [SKIP] {label}  (pip install freetype-py)")
+    else:
+        wobble = []
+        for ppem in spinner_hinting.PPEMS:
+            centres = spinner_hinting.centroids(path, ppem, hinted=True)
+            wobble.append((spinner_hinting.spread(centres), ppem, centres))
+        worst, ppem, centres = max(wobble)
+        g.check(worst <= spinner_hinting.MAX_SPREAD, label,
+                f"worst={worst:.3f}px at {ppem}ppem; "
+                + " ".join(f"{ch}={centres[ch]:.3f}"
+                           for ch in spinner_hinting.SPINNER))
 
     # --- 2. coverage ----------------------------------------------------
     for label, ((lo, hi), want, op) in COVERAGE.items():

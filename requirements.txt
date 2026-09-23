@@ -20,9 +20,11 @@ fonttools==4.63.0
 brotli==1.2.0
 ttfautohint-py==0.6.1
 #
-# freetype-py rasterises the shipped binary so the gate can assert that hinting
-# erases no horizontal bar the design draws (verify.py, check 8). verify.py
-# skips that check loudly without it, so CI must have it or the gate runs one
-# short and still reports success. It is not used by the build and does not touch the
-# output bytes, so the pin is hygiene rather than load-bearing.
+# freetype-py now participates in the output bytes as well as verification.
+# postbuild.py rasterises iterative ttfautohint passes to derive 1/8 px delta
+# controls that keep Claude Code's spinner on one vertical phase. The Python
+# wrapper pin alone does not fix the native FreeType core, so
+# spinner_hinting.py additionally rejects any runtime other than 2.13.2.
+# verify.py also uses FreeType for the hangul stroke-erasure and spinner-wobble
+# gates. Both pins are therefore load-bearing for reproducible builds.
 freetype-py==2.5.1
