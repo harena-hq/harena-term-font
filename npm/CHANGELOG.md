@@ -9,6 +9,14 @@ this package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.3] — 2026-09-23
+
+### Changed
+
+- Package Harena Term 1.0.3, which stops Claude Code's progress spinner
+  (`· ✢ ✳ ✶ ✻ ✽ *`) from bobbing vertically under `ttfautohint` grid-fitting at
+  13-18 ppem.
+
 ## [1.0.2] — 2026-08-29
 
 ### Changed
