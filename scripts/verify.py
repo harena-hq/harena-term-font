@@ -358,9 +358,9 @@ def verify(path: str, g: Gate) -> None:
     g.check(not strays, "every advance is 0, 1 or 2 cells",
             f"stray advances: {sorted(strays)[:8]}" if strays else "")
 
-    # Claude Code animates `· ✢ ✳ ✶ ✻ ✽` in one terminal cell. Their source
-    # outlines share a centre, but independent grid fitting can put successive
-    # frames on different sub-pixel phases and make the indicator bob.
+    # Claude Code uses `· ✢ ✳ ✶ ✻` on Ghostty and `· ✢ * ✶ ✻ ✽`
+    # elsewhere. Verify the union so either live branch stays on one vertical
+    # phase; independent grid fitting can otherwise make the indicator bob.
     label = "Claude Code spinner keeps one hinted vertical phase"
     if freetype is None:
         print(f"  [SKIP] {label}  (pip install freetype-py)")
