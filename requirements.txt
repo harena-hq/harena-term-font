@@ -21,9 +21,10 @@ brotli==1.2.0
 ttfautohint-py==0.6.1
 #
 # freetype-py now participates in the output bytes as well as verification.
-# postbuild.py rasterises a first ttfautohint pass to derive 1/8 px delta
-# controls that keep Claude Code's spinner on one vertical phase, then reruns
-# ttfautohint from the unhinted source with those controls. verify.py also uses
-# it for the hangul stroke-erasure and spinner-wobble gates. The pin is
-# therefore load-bearing for reproducible builds.
+# postbuild.py rasterises iterative ttfautohint passes to derive 1/8 px delta
+# controls that keep Claude Code's spinner on one vertical phase. The Python
+# wrapper pin alone does not fix the native FreeType core, so
+# spinner_hinting.py additionally rejects any runtime other than 2.13.2.
+# verify.py also uses FreeType for the hangul stroke-erasure and spinner-wobble
+# gates. Both pins are therefore load-bearing for reproducible builds.
 freetype-py==2.5.1
