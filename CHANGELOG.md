@@ -40,6 +40,25 @@ making the claim.
 
 ## [Unreleased]
 
+## [1.0.3] — 2026-09-23
+
+### Fixed
+
+- **Claude Code's progress spinner no longer bobs vertically.** The spinner's
+  frame glyphs share essentially one vertical centre in the source outlines,
+  but independent `ttfautohint` grid-fitting could snap each frame to a
+  different sub-pixel phase, most visible at 13-18 ppem (Windows Terminal's
+  DirectWrite applies the phase-dependent rounding; macOS/Ghostty's CoreText
+  mostly does not, so the defect was platform-dependent). Fixed with a
+  generated `ttfautohint` control file that shifts every contour point of each
+  frame vertically as a unit, converging iteratively until every frame lands
+  within 0.20 px of the shared target at every measured size — down from a
+  worst case of 0.881-1.131 px. Reverse-engineering the installed Claude Code
+  CLI found the frame set actually varies by terminal: `· ✢ ✳ ✶ ✻` on Ghostty,
+  `· ✢ * ✶ ✻ ✽` elsewhere — the ASCII `*` in the non-Ghostty branch is a
+  different character from the `✳` (U+2733) an earlier pass of this fix had
+  targeted, so the correction now covers the union of both live sets.
+
 ## [1.0.2] — 2026-08-29
 
 ### Fixed
