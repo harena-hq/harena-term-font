@@ -294,6 +294,9 @@ def stem(font, upm, ch, gs=None):
 
 def verify(path: str, g: Gate) -> None:
     print(f"\n=== {os.path.basename(path)} ===")
+    if freetype is not None:
+        import spinner_hinting
+        spinner_hinting.require_freetype_version()
     f = TTFont(path)
     upm = f["head"].unitsPerEm
     cmap = f.getBestCmap()
@@ -362,7 +365,6 @@ def verify(path: str, g: Gate) -> None:
     if freetype is None:
         print(f"  [SKIP] {label}  (pip install freetype-py)")
     else:
-        import spinner_hinting
         wobble = []
         for ppem in spinner_hinting.PPEMS:
             centres = spinner_hinting.centroids(path, ppem, hinted=True)
