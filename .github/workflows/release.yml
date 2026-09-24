@@ -74,6 +74,19 @@ jobs:
           echo "VERSION=$version  expected tag=$expected  actual tag=$TAG"
           [ "$TAG" = "$expected" ] || { echo "tag does not match build.VERSION"; exit 1; }
 
+      # The .deb ships as a release asset next to the ttf/woff2 zips; a stale
+      # debian/changelog version would silently ship the wrong-labelled
+      # package, so this checks it the same way the tag itself is checked.
+      - name: Check debian/changelog matches VERSION
+        if: steps.release.outputs.kind == 'font'
+        run: |
+          font_version=$(python3 scripts/font_version.py --semver)
+          deb_version=$(dpkg-parsechangelog -SVersion | sed 's/-[^-]*$//')
+          echo "font VERSION=$font_version  debian/changelog version=$deb_version"
+          [ "$deb_version" = "$font_version" ] || {
+            echo "debian/changelog is out of sync with build.VERSION"; exit 1;
+          }
+
       - name: Check the npm tag matches the package version
         if: steps.release.outputs.kind == 'npm'
         env:
@@ -157,6 +170,18 @@ jobs:
           cp -r licenses dist/
           (cd dist && zip -q -r ../release/HarenaTerm-ttf.zip   *.ttf   OFL.txt THIRD_PARTY_NOTICES.md SHA256SUMS licenses)
           (cd dist && zip -q -r ../release/HarenaTerm-woff2.zip *.woff2 OFL.txt THIRD_PARTY_NOTICES.md SHA256SUMS licenses)
+          ls -la release/
+
+      # debhelper isn't on the runner image by default; dpkg-dev
+      # (dpkg-buildpackage, dpkg-parsechangelog) already is. -us -uc: this
+      # .deb is an unsigned direct-download asset, not a PPA/archive upload,
+      # so there is no maintainer GPG signature to check at install time.
+      - name: Build the Debian package
+        if: steps.release.outputs.kind == 'font'
+        run: |
+          sudo apt-get install -y debhelper
+          dpkg-buildpackage -us -uc -b
+          mv ../fonts-harena-term_*_all.deb release/
           ls -la release/
 
       # npm/ is the reviewed package contract; this step joins it to the WOFF2
@@ -257,7 +282,8 @@ jobs:
             --notes-file release-notes.md \
             release/HarenaTerm-ttf.zip \
             release/HarenaTerm-woff2.zip \
-            release/HarenaTerm-sources-mirror.zip
+            release/HarenaTerm-sources-mirror.zip \
+            release/fonts-harena-term_*_all.deb
 
       - name: Report disabled npm publishing
         if: steps.release.outputs.kind == 'npm' && vars.NPM_PUBLISH != 'true'
