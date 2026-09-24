@@ -1,4 +1,4 @@
-harena-term-font (1.0.2-1) unstable; urgency=medium
+harena-term-font (1.0.2-1) UNRELEASED; urgency=medium
 
   * Initial Debian packaging of Harena Term as fonts-harena-term, covering
     both regional cuts (K, J) and both weights (Regular, Bold) in one
