@@ -1,0 +1,119 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Harena Term
+Upstream-Contact: Jeeyong Um <me@um.je>
+Source: https://github.com/harena-hq/harena-term-font
+Comment:
+ This file covers what fonts-harena-term actually ships: the four compiled
+ TrueType files (Files: dist/*.ttf below) and the Debian packaging itself
+ (Files: debian/*). The fonts are a derivative work assembled from several
+ upstream sources plus fourteen separately licensed Nerd Fonts icon sets;
+ the complete provenance, per-source SHA-256 pins and a glyph-range
+ breakdown of every bundled icon set are in THIRD_PARTY_NOTICES.md, which
+ this package installs as documentation at
+ /usr/share/doc/fonts-harena-term/THIRD_PARTY_NOTICES.md, alongside the
+ full text of every non-common license referenced below under
+ /usr/share/doc/fonts-harena-term/licenses/. This file does not attempt a
+ copyright audit of the rest of the source repository (build scripts,
+ fetched upstream sources, tooling), which is not shipped in this binary
+ package.
+
+Files: dist/*.ttf
+Copyright:
+ 2026 Jeeyong Um <https://github.com/conr2d>, with Reserved Font Name
+  "Harena Term"
+ 2015-2023 Renzhi Li (aka. Belleve Invis, belleve@typeof.net)
+ 2021 Kil Hyung-jin (https://github.com/orioncactus/pretendard), with
+  Reserved Font Name "Pretendard JP"
+ 2016 The M+ Project Authors
+ 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name "Source"
+ Pictogrammers, for Material Design Icons
+ 2024 Fonticons, Inc., for Font Awesome Free
+ the Devicons project, for Devicons (upstream MIT text carries no
+  copyright line)
+ Microsoft Corporation, for Codicons
+ GitHub, Inc., for Octicons
+ Erik Flowers, for Weather Icons
+ 2017 André Luiz Gava, for Font Awesome Extension
+ 2014 Jesse Weed, for Seti-UI and the Nerd Fonts originals derived from it
+ the Font Logos (formerly Font Linux) contributors, released into the
+  public domain via the Unlicense
+ 2016 Ryan L McIntyre, for Powerline Extra Symbols
+ 2021 Gabriele Lana, for Pomicons
+ 2013 Kim Silkebækken and other contributors, for Powerline Symbols
+ no copyright statement is published upstream for IEC Power Symbols
+License: OFL-1.1 and Apache-2.0 and CC-BY-4.0 and MIT and Unlicense
+Comment:
+ Each shipped .ttf is a single compiled file aggregating glyphs from all of
+ the sources above under their own licenses; no one license covers the
+ whole binary. See THIRD_PARTY_NOTICES.md for which codepoint ranges come
+ from which source and under which of the licenses named above.
+
+Files: debian/*
+Copyright: 2026 Jeeyong Um <me@um.je>
+License: Apache-2.0
+Comment:
+ Matches the license this repository uses for its build tooling and
+ documentation (see the root LICENSE file, not shipped in this binary
+ package).
+
+License: OFL-1.1
+Comment:
+ Applies to the Latin base (Iosevka Term Nerd Font Mono / Iosevka source),
+ the CJK glyphs (Pretendard JP), the eighteen CJK bracket forms (M PLUS
+ 1p), the enclosed/squared CJK blocks and archaic jamo (Noto Sans KR /
+ Source Han Sans), and two of the bundled icon sets (Weather Icons,
+ Pomicons). Also the root license of the shipped Harena Term family
+ itself, a Reserved Font Name.
+ .
+ Full text:
+ /usr/share/doc/fonts-harena-term/licenses/Iosevka-OFL-1.1.md
+ /usr/share/doc/fonts-harena-term/licenses/PretendardJP-OFL-1.1.txt
+ /usr/share/doc/fonts-harena-term/licenses/MPLUS1p-OFL-1.1.txt
+ /usr/share/doc/fonts-harena-term/licenses/NotoSansKR-OFL-1.1.txt
+ /usr/share/doc/fonts-harena-term/licenses/WeatherIcons-OFL-1.1.txt
+ /usr/share/doc/fonts-harena-term/licenses/Pomicons-OFL-1.1.txt
+ /usr/share/doc/fonts-harena-term/OFL.txt
+
+License: Apache-2.0
+Comment:
+ Applies to Material Design Icons, shipped under the Pictogrammers Free
+ License, itself a redistribution grant under Apache-2.0; Apache-2.0 also
+ covers this package's own debian/* files (see above).
+ .
+ Full text:
+ /usr/share/doc/fonts-harena-term/licenses/Apache-2.0.txt
+ /usr/share/doc/fonts-harena-term/licenses/MaterialDesignIcons-PictogrammersFreeLicense.txt
+
+License: CC-BY-4.0
+Comment:
+ Applies to Font Awesome Free (icons only) and Codicons. Attribution is a
+ condition of this license for both sets.
+ .
+ Full text:
+ /usr/share/doc/fonts-harena-term/licenses/FontAwesome-Free.txt
+ /usr/share/doc/fonts-harena-term/licenses/Codicons-CC-BY-4.0.txt
+
+License: MIT
+Comment:
+ Applies to Devicons, Octicons, Font Awesome Extension, Seti-UI, the Nerd
+ Fonts originals derived from Seti-UI, Powerline Extra Symbols, Powerline
+ Symbols and IEC Power Symbols. IEC Power Symbols carries no separately
+ published license text upstream; its inclusion here follows the Nerd
+ Fonts project's own audit.
+ .
+ Full text:
+ /usr/share/doc/fonts-harena-term/licenses/Devicons-MIT.txt
+ /usr/share/doc/fonts-harena-term/licenses/Octicons-MIT.txt
+ /usr/share/doc/fonts-harena-term/licenses/FontAwesomeExtension-MIT.txt
+ /usr/share/doc/fonts-harena-term/licenses/SetiUI-MIT.txt
+ /usr/share/doc/fonts-harena-term/licenses/PowerlineExtraSymbols-MIT.txt
+ /usr/share/doc/fonts-harena-term/licenses/PowerlineSymbols-MIT.txt
+
+License: Unlicense
+Comment:
+ Applies to Font Logos (formerly Font Linux), released into the public
+ domain. The logos themselves remain trademarks of their respective
+ owners; the dedication covers only the artwork.
+ .
+ Full text:
+ /usr/share/doc/fonts-harena-term/licenses/FontLogos-Unlicense.txt

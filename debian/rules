@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+# Release builds only ever run `dpkg-buildpackage -b` (binary-only) from a
+# clean CI checkout that never has .private/, lab/, node_modules/, sources/,
+# build/, .omc/ or .omx/ in it. debian/source/options is defense-in-depth for
+# anyone building a source package locally, not the only safeguard.
+
+%:
+	dh $@
+
+# Several docs referenced by path from debian/copyright ("Full text: ...")
+# are over dh_compress's 4096-byte threshold; compressing them would break
+# those paths after install.
+override_dh_compress:
+	dh_compress -X.md -X.txt

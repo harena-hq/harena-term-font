@@ -1,0 +1,14 @@
+harena-term-font (1.0.3-1) UNRELEASED; urgency=medium
+
+  * Package Harena Term 1.0.3, which stops Claude Code's progress spinner
+    from bobbing vertically under ttfautohint grid-fitting.
+
+ -- Jeeyong Um <me@um.je>  Thu, 24 Sep 2026 00:00:00 +0000
+
+harena-term-font (1.0.2-1) UNRELEASED; urgency=medium
+
+  * Initial Debian packaging of Harena Term as fonts-harena-term, covering
+    both regional cuts (K, J) and both weights (Regular, Bold) in one
+    package, installed to /usr/share/fonts/truetype/harena-term/.
+
+ -- Jeeyong Um <me@um.je>  Fri, 18 Sep 2026 09:49:28 +0000

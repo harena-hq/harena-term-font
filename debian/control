@@ -1,0 +1,30 @@
+Source: harena-term-font
+Section: fonts
+Priority: optional
+Maintainer: Jeeyong Um <me@um.je>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Homepage: https://github.com/harena-hq/harena-term-font
+Rules-Requires-Root: no
+
+Package: fonts-harena-term
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Description: dual-script Korean/Japanese terminal font with Nerd Font icons
+ Harena Term is a monospaced terminal typeface pairing an Iosevka-derived
+ Latin design with CJK glyphs drawn primarily from Pretendard JP, laid out
+ on a strict 1:2 Latin-to-CJK cell grid so Latin and East Asian text stay
+ aligned in a terminal's character grid.
+ .
+ This package provides both regional cuts in a single install: the K face
+ bakes Korean-preferred (ss05) glyph forms into its cmap, and the J face
+ keeps the unmodified Pretendard JP forms; 537 hanja differ between them.
+ Each cut ships in Regular and Bold weights, for four TrueType files in
+ total.
+ .
+ The font also bundles glyph coverage from fourteen separately licensed
+ Nerd Fonts icon sets (Material Design Icons, Font Awesome Free, Devicons,
+ Codicons, Octicons, Weather Icons and others), giving terminal prompts,
+ editors and other Powerline- or Nerd-Font-aware tools their expected icon
+ glyphs.
