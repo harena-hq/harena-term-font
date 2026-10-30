@@ -36,6 +36,7 @@ except ImportError:  # the stroke-erasure check is skipped, loudly, without it
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build  # noqa: E402  -- needs the path above when run from elsewhere
+import provenance  # noqa: E402
 
 XTERM_WIDTHS = "build/xterm-widths.json"
 IOS = "sources/cand/IosevkaTerm/IosevkaTermNerdFontMono-{style}.ttf"
@@ -724,6 +725,39 @@ def verify(path: str, g: Gate) -> None:
     f.close()
 
 
+def verify_pins(g: Gate) -> None:
+    """THIRD_PARTY_NOTICES.md names exactly the sources the build fetches.
+
+    The pins live twice: executable in fetch_sources.sh, prose in provenance.py.
+    Bumping one alone would ship a notice naming a source the build no longer
+    read, and nothing else fails on it.
+    """
+    print("\n=== source pins ===")
+    out = subprocess.run(
+        ["bash", os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              "fetch_sources.sh"), "--pins"],
+        capture_output=True, text=True, check=True).stdout
+    fetched = {tuple(line.split("|")) for line in out.splitlines() if line}
+
+    noticed = set()
+    for _name, archive, url, *_ in provenance.SOURCES:
+        noticed.add((url, archive))
+    for extras in provenance.EXTRA_FILES.values():
+        for path, url, _why in extras:
+            noticed.add((url, path))
+    for _name, url, tag, commit, *_ in provenance.GIT_SOURCES:
+        noticed.add(("git", url, tag, commit))
+
+    def show(pins):
+        return " ".join("|".join(p) for p in sorted(pins))
+
+    g.check(fetched == noticed,
+            "provenance.py names exactly the pins in fetch_sources.sh",
+            (f"fetched only: {show(fetched - noticed) or '-'}; "
+             f"noticed only: {show(noticed - fetched) or '-'}")
+            if fetched != noticed else f"{len(fetched)} pins")
+
+
 def main() -> int:
     paths = sys.argv[1:]
     if not paths:
@@ -733,6 +767,7 @@ def main() -> int:
         print("no fonts to verify", file=sys.stderr)
         return 1
     g = Gate()
+    verify_pins(g)
     for p in paths:
         verify(p, g)
     print(f"\n{g.checks - len(g.fails)}/{g.checks} checks passed")

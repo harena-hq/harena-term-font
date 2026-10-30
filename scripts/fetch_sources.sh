@@ -13,6 +13,8 @@
 #   scripts/fetch_sources.sh              fetch everything and build the Latin
 #   scripts/fetch_sources.sh --no-latin   skip the Iosevka build (slow, needs Node)
 #   scripts/fetch_sources.sh --list       print the pinned files, one per line
+#   scripts/fetch_sources.sh --pins       print every pin as url|destination, and
+#                                         the Iosevka clone as git|url|tag|commit
 #
 # Optional: set HARENA_SOURCE_MIRROR to a base URL holding these files by
 # basename. Used only when an upstream fetch fails, which is the failure mode a
@@ -28,6 +30,7 @@ LIST_ONLY=0
 case "${1:-}" in
   --no-latin) BUILD_LATIN=0 ;;
   --list)     LIST_ONLY=1 ;;
+  --pins)     LIST_ONLY=pins ;;
 esac
 
 MIRROR="${HARENA_SOURCE_MIRROR:-}"
@@ -38,6 +41,7 @@ MIRROR="${HARENA_SOURCE_MIRROR:-}"
 GF_MPLUS_COMMIT=d714b17ce2379f06daf6295617f961df605dccb5
 GF_NOTO_COMMIT=b38c5c93af322c45f633e17ac440ec1e6c94d489
 
+IOSEVKA_REPO=https://github.com/be5invis/Iosevka.git
 IOSEVKA_TAG=v34.8.0
 IOSEVKA_COMMIT=ca3ad8e280e2f0b614a5a7721b047daaf023713d
 
@@ -67,12 +71,24 @@ verify() {  # verify <file> <sha256>
   fi
 }
 
-if [ "$LIST_ONLY" = 1 ]; then
-  while IFS='|' read -r _url _sha dest; do
-    [ -n "$dest" ] && printf '%s\n' "$dest"
+# scripts/provenance.py restates these pins as prose for THIRD_PARTY_NOTICES.md;
+# scripts/verify.py compares the two through `--pins`, so bumping one without
+# the other fails the gate instead of shipping a notice for a source the build
+# no longer reads.
+if [ "$LIST_ONLY" != 0 ]; then
+  while IFS='|' read -r url _sha dest; do
+    [ -n "$dest" ] || continue
+    if [ "$LIST_ONLY" = pins ]; then
+      printf '%s|%s\n' "$url" "$dest"
+    else
+      printf '%s\n' "$dest"
+    fi
   done <<EOF
 $PINS
 EOF
+  if [ "$LIST_ONLY" = pins ]; then
+    printf 'git|%s|%s|%s\n' "$IOSEVKA_REPO" "$IOSEVKA_TAG" "$IOSEVKA_COMMIT"
+  fi
   exit 0
 fi
 
@@ -136,7 +152,7 @@ fi
 if [ ! -d sources/iosevka-src ]; then
   say "clone Iosevka $IOSEVKA_TAG"
   git clone --filter=blob:none --branch "$IOSEVKA_TAG" \
-    https://github.com/be5invis/Iosevka.git sources/iosevka-src
+    "$IOSEVKA_REPO" sources/iosevka-src
 fi
 
 got_commit=$(git -C sources/iosevka-src rev-parse HEAD)
