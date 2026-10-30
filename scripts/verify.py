@@ -733,11 +733,19 @@ def verify_pins(g: Gate) -> None:
     read, and nothing else fails on it.
     """
     print("\n=== source pins ===")
-    out = subprocess.run(
+    label = "provenance.py names exactly the pins in fetch_sources.sh"
+    proc = subprocess.run(
         ["bash", os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               "fetch_sources.sh"), "--pins"],
-        capture_output=True, text=True, check=True).stdout
-    fetched = {tuple(line.split("|")) for line in out.splitlines() if line}
+        capture_output=True, text=True)
+    if proc.returncode != 0:
+        # A failed listing is the same verdict as a mismatch, said as one.
+        err = proc.stderr.strip().splitlines()
+        g.check(False, label, f"fetch_sources.sh --pins exited "
+                f"{proc.returncode}" + (f": {err[-1]}" if err else ""))
+        return
+    fetched = {tuple(line.split("|"))
+               for line in proc.stdout.splitlines() if line}
 
     noticed = set()
     for _name, archive, url, *_ in provenance.SOURCES:
@@ -751,8 +759,7 @@ def verify_pins(g: Gate) -> None:
     def show(pins):
         return " ".join("|".join(p) for p in sorted(pins))
 
-    g.check(fetched == noticed,
-            "provenance.py names exactly the pins in fetch_sources.sh",
+    g.check(fetched == noticed, label,
             (f"fetched only: {show(fetched - noticed) or '-'}; "
              f"noticed only: {show(noticed - fetched) or '-'}")
             if fetched != noticed else f"{len(fetched)} pins")
