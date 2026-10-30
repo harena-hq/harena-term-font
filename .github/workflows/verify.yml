@@ -60,8 +60,15 @@ jobs:
         run: |
           python3 scripts/verify.py | tee gate.log
           grep -q '^gate: PASS$' gate.log
-      - name: Verify the build is reproducible
-        run: cd dist && sha256sum -c ../SHA256SUMS
+      # postbuild.py rewrites SHA256SUMS from this build, so checking dist/
+      # against it alone always passes. Comparing against the committed file is
+      # what release.yml does; doing it here too means a PR that changes the
+      # output bytes must commit the new SHA256SUMS, instead of the mismatch
+      # first surfacing when a tag is cut.
+      - name: Verify the build reproduces the recorded bytes
+        run: |
+          git diff --exit-code -- SHA256SUMS
+          cd dist && sha256sum -c ../SHA256SUMS
       # Exercise the registry-facing contract before a tag exists. This also
       # proves that an npm-only patch may retain the recorded font version and
       # that every CSS URL resolves in an installed tarball.
